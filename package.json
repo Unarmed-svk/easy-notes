@@ -1,6 +1,7 @@
 {
   "name": "mui-course",
   "version": "0.1.0",
+  "homepage": ".",
   "private": true,
   "dependencies": {
     "accesscontrol": "^2.2.1",
