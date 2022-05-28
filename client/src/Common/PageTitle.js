@@ -25,6 +25,12 @@ const PageTitle = ({ title, linkTo, linkIcon }) => {
       color: ${theme.palette.grey[800]};
       font-weight: ${theme.typography.fontWeightBold};
     }
+
+    ${theme.breakpoints.up("md")} {
+      & .MuiLink-root {
+        display: none;
+      }
+    }
   `;
 
   return (

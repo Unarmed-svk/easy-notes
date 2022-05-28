@@ -166,7 +166,7 @@ const Notes = ({ theme }) => {
     filteredNotes: [],
   });
 
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isPortrait = useMediaQuery(theme.breakpoints.down("md"));
 
   const handleFirstAction = (id, status) => {
     switch (status) {
@@ -282,7 +282,7 @@ const Notes = ({ theme }) => {
           </div>
         ))}
       </Masonry>
-      <Zoom in={isMobile}>
+      <Zoom in={isPortrait}>
         <Fab
           color="primary"
           size="large"

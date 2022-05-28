@@ -2,7 +2,7 @@ import { css, useTheme } from "@emotion/react";
 import { Typography } from "@mui/material";
 import React from "react";
 
-const Logo = ({ variant, textAlign }) => {
+const Logo = ({ variant, component, textAlign, className, forwardedRef }) => {
   const theme = useTheme();
   const styles = {
     typography: css`
@@ -20,7 +20,13 @@ const Logo = ({ variant, textAlign }) => {
   };
 
   return (
-    <Typography variant={variant || "h5"} sx={styles.typography}>
+    <Typography
+      variant={variant || "h5"}
+      component={component || "h4"}
+      sx={styles.typography}
+      className={className || ""}
+      ref={forwardedRef}
+    >
       <span className="logo-accent">Easy</span> Notes
     </Typography>
   );

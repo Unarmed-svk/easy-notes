@@ -16,8 +16,11 @@ import { styled } from "@mui/material/styles";
 import { format } from "date-fns";
 import sk from "date-fns/locale/sk";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import Logo from "./Logo";
+import SiteLogo from "./Logo";
 import UserButton from "./AccountButton";
+import React, { useRef } from "react";
+import { AnimatePresence } from "framer-motion";
+import Slide from "./Animations/Slide";
 
 const drawerWidth = 240;
 const menuItems = [
@@ -76,6 +79,10 @@ const Layout = ({ theme, user }) => {
       }
       & .toolbar-left {
         flex-grow: 1;
+        overflow: hidden;
+      }
+      & .toolbar-logo {
+        font-size: ${theme.typography.h5.fontSize};
       }
       & .user-name {
         margin-right: ${theme.spacing(2)};
@@ -83,10 +90,16 @@ const Layout = ({ theme, user }) => {
     `,
   };
 
+  const transitionDuration = {
+    enter: theme.transitions.duration.enteringScreen,
+    exit: theme.transitions.duration.leavingScreen,
+  };
+
   const Offset = styled("div")(() => theme.mixins.toolbar);
+  const toolbarRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  // const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isPortrait = useMediaQuery(theme.breakpoints.down("md"));
 
   const getUserName = () => {
     const { firstname, lastname, email } = user.data;
@@ -94,13 +107,49 @@ const Layout = ({ theme, user }) => {
     else return email;
   };
 
+  //TODO: renderHaderLeft - Change to FRAMER MOTION animations for goodness sake.
+  const renderHeaderLeft = () => (
+    <div className="toolbar-left">
+      <AnimatePresence exitBeforeEnter>
+        {isPortrait ? (
+          <Slide key={"logo"} start={{ x: 0, y: -50 }} exit={{ x: 0, y: 50 }}>
+            <Logo variant={"h5"} className="toolbar-logo" />
+          </Slide>
+        ) : (
+          <Slide key={"date"} start={{ x: 0, y: -50 }} exit={{ x: 0, y: 50 }}>
+            <Typography>Dnes je {format(new Date(), "do MMMM Y", { locale: sk })}</Typography>
+          </Slide>
+        )}
+      </AnimatePresence>
+      {/* <Slide
+        direction={"up"}
+        in={!isPortrait}
+        container={toolbarRef.current}
+        timeout={transitionDuration}
+        style={{ transitionDelay: `${!isPortrait ? transitionDuration.exit : 0}ms` }}
+        unmountOnExit
+      >
+        <Typography>Dnes je {format(new Date(), "do MMMM Y", { locale: sk })}</Typography>
+      </Slide>
+
+      <Slide
+        direction="up"
+        in={isPortrait}
+        container={toolbarRef.current}
+        timeout={transitionDuration}
+        style={{ transitionDelay: `${isPortrait ? transitionDuration.exit : 0}ms` }}
+        unmountOnExit
+      >
+        <Logo variant={"h5"} className="toolbar-logo" />
+      </Slide> */}
+    </div>
+  );
+
   return (
     <div css={styles.root}>
       <AppBar sx={styles.appbar} color={"background"} position="fixed" elevation={0}>
-        <Toolbar sx={styles.toolbar}>
-          <Typography className="toolbar-left">
-            Dnes je {format(new Date(), "do MMMM Y", { locale: sk })}
-          </Typography>
+        <Toolbar sx={styles.toolbar} ref={toolbarRef}>
+          {renderHeaderLeft()}
           <Typography className="user-name">{getUserName()}</Typography>
           <UserButton user={user} theme={theme} />
         </Toolbar>
@@ -132,5 +181,7 @@ const Layout = ({ theme, user }) => {
     </div>
   );
 };
+
+const Logo = React.forwardRef((props, ref) => <SiteLogo {...props} forwardedRef={ref} />);
 
 export default Layout;

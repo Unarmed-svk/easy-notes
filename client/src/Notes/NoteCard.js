@@ -73,8 +73,7 @@ const NoteCard = ({
     card: css`
       position: relative;
       border-radius: 1.4rem;
-      box-shadow: none;
-      filter: ${theme.filter[1]};
+      box-shadow: ${theme.softShadow[1]};
       z-index: 1;
 
       .MuiCardHeader-content > .MuiCardHeader-subheader {
