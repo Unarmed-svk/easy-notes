@@ -15,12 +15,12 @@ import {
 import { styled } from "@mui/material/styles";
 import { format } from "date-fns";
 import sk from "date-fns/locale/sk";
-import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import SiteLogo from "./Logo";
-import UserButton from "./AccountButton";
-import React, { useRef } from "react";
 import { AnimatePresence } from "framer-motion";
+import React, { useRef } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import UserButton from "./AccountButton";
 import Slide from "./Animations/Slide";
+import SiteLogo from "./Logo";
 
 const drawerWidth = 240;
 const menuItems = [
@@ -86,13 +86,17 @@ const Layout = ({ theme, user }) => {
       }
       & .user-name {
         margin-right: ${theme.spacing(2)};
+        flex-shrink: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      ${theme.breakpoints.down("sm")} {
+        & .user-name {
+          display: none;
+        }
       }
     `,
-  };
-
-  const transitionDuration = {
-    enter: theme.transitions.duration.enteringScreen,
-    exit: theme.transitions.duration.leavingScreen,
   };
 
   const Offset = styled("div")(() => theme.mixins.toolbar);
@@ -107,7 +111,6 @@ const Layout = ({ theme, user }) => {
     else return email;
   };
 
-  //TODO: renderHaderLeft - Change to FRAMER MOTION animations for goodness sake.
   const renderHeaderLeft = () => (
     <div className="toolbar-left">
       <AnimatePresence exitBeforeEnter>
@@ -121,27 +124,6 @@ const Layout = ({ theme, user }) => {
           </Slide>
         )}
       </AnimatePresence>
-      {/* <Slide
-        direction={"up"}
-        in={!isPortrait}
-        container={toolbarRef.current}
-        timeout={transitionDuration}
-        style={{ transitionDelay: `${!isPortrait ? transitionDuration.exit : 0}ms` }}
-        unmountOnExit
-      >
-        <Typography>Dnes je {format(new Date(), "do MMMM Y", { locale: sk })}</Typography>
-      </Slide>
-
-      <Slide
-        direction="up"
-        in={isPortrait}
-        container={toolbarRef.current}
-        timeout={transitionDuration}
-        style={{ transitionDelay: `${isPortrait ? transitionDuration.exit : 0}ms` }}
-        unmountOnExit
-      >
-        <Logo variant={"h5"} className="toolbar-logo" />
-      </Slide> */}
     </div>
   );
 

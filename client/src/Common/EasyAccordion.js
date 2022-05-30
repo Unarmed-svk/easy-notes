@@ -3,11 +3,31 @@ import { Accordion, AccordionDetails, AccordionSummary, Typography } from "@mui/
 import { css, useTheme } from "@emotion/react";
 import React from "react";
 
-const EasyAccordion = ({ children, expanded, id, summary, accordionSx, onChange }) => {
+const EasyAccordion = ({ children, expanded, id, summary, accordionSx, onChange, ...rest }) => {
   const theme = useTheme();
   const styles = {
     acc: css`
       background-color: transparent;
+
+      &:before {
+        display: none;
+      }
+      &:after {
+        position: absolute;
+        bottom: 1px;
+        left: 0;
+        right: 0;
+        height: 1px;
+        content: "";
+        opacity: 0;
+        background-color: ${theme.palette.divider};
+        transition: opacity 150ms ${theme.transitions.easing.easeInOut};
+        transition-delay: 180ms;
+      }
+      &.Mui-expanded::after {
+        opacity: 1;
+        transition-delay: 0ms;
+      }
     `,
     accSummary: css`
       flex-direction: row-reverse;
@@ -25,6 +45,11 @@ const EasyAccordion = ({ children, expanded, id, summary, accordionSx, onChange 
       }
       & .MuiAccordionSummary-content .MuiTypography-root {
       }
+
+      ${theme.breakpoints.down("sm")} {
+        padding-left: 0;
+        padding-right: 0;
+      }
     `,
   };
 
@@ -38,6 +63,7 @@ const EasyAccordion = ({ children, expanded, id, summary, accordionSx, onChange 
         ${accordionSx}
       `}
       onChange={(...params) => onChange(id, ...params)}
+      {...rest}
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={{ fontSize: "1.75rem" }} />}

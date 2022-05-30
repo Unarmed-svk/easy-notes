@@ -1,9 +1,8 @@
-import { useTheme } from "@emotion/react";
+import { css, useTheme } from "@emotion/react";
 import {
   Avatar,
   Dialog,
   DialogActions,
-  DialogContent,
   DialogTitle,
   IconButton,
   List,
@@ -11,38 +10,54 @@ import {
   MenuItem,
   useMediaQuery,
 } from "@mui/material";
+import { Box } from "@mui/system";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { css } from "@emotion/react";
 import EasyButtons from "./EasyButtons";
-import { Box } from "@mui/system";
 
 const menuItems = [
   { name: "Profile", linkTo: "/profile" },
   { name: "Log out", linkTo: "/signout" },
 ];
 
-const styles = {
-  avatar: { bgcolor: "primary.main", textTransform: "uppercase" },
-  dialogTitle: { display: "flex", flexDirection: "row", columnGap: "1.2rem", alignItems: "center" },
-  dialog: css`
-    .MuiDialogTitle-root {
-      padding: 0.6rem 1.2rem;
-    }
-
-    .MuiDialogTitle-root .DialogTitle-username {
-      display: block;
-      font-size: 1.4rem;
-      line-height: 1;
-    }
-  `,
-};
-
 export default function AccountButton({ user }) {
+  const theme = useTheme();
+  const styles = {
+    avatar: { bgcolor: "primary.main", textTransform: "uppercase" },
+    dialogTitle: {
+      display: "flex",
+      flexDirection: "row",
+      columnGap: "1.2rem",
+      alignItems: "center",
+    },
+    dialog: css`
+      .MuiPaper-root {
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      .MuiDialogTitle-root {
+        padding: 0.6rem 1.8rem 1rem 1.8rem;
+        border-bottom: 1px solid ${theme.palette.divider};
+      }
+
+      .MuiDialogTitle-root .DialogTitle-username {
+        display: block;
+        flex-shrink: 0;
+        max-width: 85%;
+        font-size: 1.4rem;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    `,
+  };
+
   const [menuAnchor, setMenuAnchor] = useState(null);
   const navigate = useNavigate();
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("lg"));
+  const isTabletWide = useMediaQuery(theme.breakpoints.down("lg"));
+  // const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const onAccountClick = (e) => setMenuAnchor(e.currentTarget);
   const onAccountClose = () => setMenuAnchor(null);
@@ -73,12 +88,13 @@ export default function AccountButton({ user }) {
   return (
     <div>
       <ReusableDialog
-        isOpen={isSmallScreen && Boolean(menuAnchor)}
+        isOpen={isTabletWide && Boolean(menuAnchor)}
         title={renderDialogTitle()}
         sx={styles.dialog}
         onClose={onAccountClose}
       >
-        <List sx={{ py: 1.5 }}>
+        {/* TODO: Maybe make the dialog fullscreen when the user is on a mobile device */}
+        <List sx={{ py: 1.5, px: 1.2 }}>
           {renderMenuItems({
             px: 2.5,
             py: 1.4,
@@ -110,7 +126,7 @@ export default function AccountButton({ user }) {
           vertical: "top",
           horizontal: "center",
         }}
-        open={!isSmallScreen && Boolean(menuAnchor)}
+        open={!isTabletWide && Boolean(menuAnchor)}
         onClose={onAccountClose}
       >
         {renderMenuItems({ px: 4, py: 1.2 })}
@@ -141,6 +157,7 @@ const ReusableDialog = ({
   sx,
   onClose,
   onConfirm,
+  ...rest
 }) => {
   return (
     <Dialog
@@ -150,6 +167,7 @@ const ReusableDialog = ({
         ${dialogStyle};
         ${sx};
       `}
+      {...rest}
     >
       <DialogTitle>{title}</DialogTitle>
       {children}

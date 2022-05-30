@@ -22,7 +22,6 @@ import React from "react";
 import { css } from "@emotion/react";
 import { useTheme } from "@mui/system";
 import { blue, green, orange, red } from "@mui/material/colors";
-import EasyButtons from "../Common/EasyButtons";
 import { differenceInCalendarDays, format, startOfToday } from "date-fns";
 import skLocale from "date-fns/locale/sk";
 import { dateToReadableString } from "../helpers/optimisations";
@@ -54,21 +53,6 @@ const NoteCard = ({
   const styles = {
     cardContainer: css`
       border-radius: 8px;
-
-      .NoteCard-buttonsContainer button {
-        opacity: 0;
-        transform: translate(0, -35px);
-        transition-property: transform, opacity, background-color;
-        transition-duration: 250ms;
-        transition-timing-function: ${theme.transitions.easing.easeOut};
-      }
-      .NoteCard-buttonsContainer button:nth-of-type(2n) {
-        transition-delay: 60ms;
-      }
-      &:hover .NoteCard-buttonsContainer button {
-        opacity: 1;
-        transform: translate(0, 0px);
-      }
     `,
     card: css`
       position: relative;
@@ -296,30 +280,6 @@ const NoteCard = ({
           </Stack>
         </CardContent>
       </Card>
-      {/* <div css={styles.buttonsContainer} className="NoteCard-buttonsContainer">
-        <EasyTooltip title={getTooltipText(true)} placement="top">
-          <EasyButtons.Sharp
-            color={status === "completed" ? "warning" : "success"}
-            fullWidth
-            sx={styles.button}
-            onClick={() => onFirstAction(_id, status)}
-          >
-            {renderActionIcon(true)}
-          </EasyButtons.Sharp>
-        </EasyTooltip>
-        {status !== "completed" && (
-          <EasyTooltip title={getTooltipText(false)} placement="top">
-            <EasyButtons.Sharp
-              color="error"
-              fullWidth
-              sx={styles.button}
-              onClick={() => onSecondAction(_id, status)}
-            >
-              {renderActionIcon(false)}
-            </EasyButtons.Sharp>
-          </EasyTooltip>
-        )}
-      </div> */}
     </div>
   );
 };

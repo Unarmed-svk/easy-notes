@@ -282,6 +282,7 @@ const Notes = ({ theme }) => {
           </div>
         ))}
       </Masonry>
+      {/* TODO: Display a placeholder image or text if the notebook is empty, with a button for a new note */}
       <Zoom in={isPortrait}>
         <Fab
           color="primary"

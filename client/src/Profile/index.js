@@ -1,54 +1,49 @@
-import React, { useEffect, useState } from "react";
 import { css } from "@emotion/react";
+import { Alert, Collapse, Container } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, Collapse, Container, Link, Typography } from "@mui/material";
+import EasyAccordion from "../Common/EasyAccordion";
+import PageTitle from "../Common/PageTitle";
 import { clearNotification } from "../store/actions";
 import { patchUserPassword, patchUserProfile } from "../store/actions/user.action";
-import EasyAccordion from "../Common/EasyAccordion";
 import { DetailsChangeForm, PasswordChangeForm } from "./UserProfileForms";
-import { ArrowBack } from "@mui/icons-material";
-import { Link as RouterLink } from "react-router-dom";
-import PageTitle from "../Common/PageTitle";
 
-const styles = {
-  formTitle: css`
-    font-weight: bold;
-    margin-top: 12px;
-    margin-bottom: 25px;
+const Profile = ({ theme }) => {
+  const styles = {
+    formsContainer: css`
+      box-sizing: border-box;
+      max-width: 40rem;
+      margin-left: 4rem;
+      padding: 0 2.5rem 2.5rem;
 
-    & .MuiLink-root {
-      display: inline-block;
-      line-height: 1;
-    }
+      ${theme.breakpoints.down("md")} {
+        margin: 0 auto;
+      }
+      ${theme.breakpoints.down("sm")} {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    `,
+    accordion: css`
+      border-bottom: none;
 
-    & .MuiSvgIcon-root {
-      display: inline-block;
-      line-height: 1;
-      vertical-align: top;
-    }
-  `,
-  formsContainer: css`
-    box-sizing: border-box;
-    max-width: 40rem;
-    margin: 0 4rem;
-    padding: 0 2.5rem 2.5rem;
-  `,
-  accordion: css`
-    border-bottom: none;
-    &:before {
-      display: none;
-    }
-    & .MuiAccordionDetails-root {
-      padding: 1.25rem 4rem 2rem 4rem;
-    }
-  `,
-  notificationContainer: css`
-    margin-bottom: 0.8rem;
-    min-height: 3em;
-  `,
-};
+      & .MuiAccordionDetails-root {
+        padding: 1.25rem 4rem 2rem 4rem;
+      }
 
-const Profile = () => {
+      ${theme.breakpoints.down("sm")} {
+        & .MuiAccordionDetails-root {
+          padding-left: 0;
+          padding-right: 0;
+        }
+      }
+    `,
+    notificationContainer: css`
+      margin-bottom: 0.8rem;
+      min-height: 3em;
+    `,
+  };
+
   const notification = useSelector((state) => state.notification);
   const user = useSelector((state) => state.user.data);
   const dispatch = useDispatch();
@@ -101,13 +96,6 @@ const Profile = () => {
 
   return (
     <Container>
-      {/* <Typography variant="h4" component="h3" sx={styles.formTitle}>
-        <Link color="secondary" underline="none" component={RouterLink} to="/">
-          <ArrowBack sx={{ fontSize: "inherit" }} />
-        </Link>
-        &nbsp; Edit Profile
-      </Typography> */}
-
       <PageTitle title="Edit Profile" linkTo="/" />
 
       <div css={styles.formsContainer}>
@@ -129,6 +117,7 @@ const Profile = () => {
           summary="Edit Profile"
           accordionSx={styles.accordion}
           onChange={handleChange}
+          className="FirstAccordion"
         >
           <DetailsChangeForm
             formID="details"

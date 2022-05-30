@@ -180,3 +180,6 @@ const EasyAlert = React.forwardRef(function EasyAlert(props, ref) {
 });
 
 export default App;
+
+// TODO: Change all english texts into slovak.
+// TODO: Futher optimise for mobile screens.
