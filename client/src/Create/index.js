@@ -182,10 +182,7 @@ const Create = ({ theme }) => {
 
   return (
     <Container>
-      {/* <Typography variant="h4" component="h3" color="textSecondary" sx={styles.title} gutterBottom>
-        Vytvoriť Novú Poznámku
-      </Typography> */}
-      <PageTitle title="Vytvoriť Novú Poznámku" linkTo="/" />
+      <PageTitle title="Nová Poznámka" linkTo="/" />
 
       <form noValidate autoComplete="off" onSubmit={handleSubmit}>
         <DebouncedTextField

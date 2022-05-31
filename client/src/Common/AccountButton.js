@@ -71,6 +71,7 @@ export default function AccountButton({ user }) {
     navigate(item.linkTo);
   };
 
+  // TODO: Change the static profile picture
   const renderDialogTitle = () => (
     <Box sx={styles.dialogTitle}>
       <Avatar src="/dave.png" alt={getAvatarAlt()} sx={styles.avatar} />

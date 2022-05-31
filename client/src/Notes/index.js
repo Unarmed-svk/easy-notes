@@ -14,6 +14,7 @@ import { parseISO } from "date-fns";
 import EasyDialog from "../Common/EasyDialog";
 import { getPreferences, savePreferences } from "../helpers/tools";
 import { useNavigate } from "react-router-dom";
+import NotesPagePlaceholder from "./NotesPagePlaceholder";
 
 const DEFAULT_FILTER_STATE = {
   sortDate: FILTER_TYPES.NEWEST,
@@ -149,6 +150,12 @@ const Notes = ({ theme }) => {
       bottom: 3rem;
       z-index: ${theme.zIndex.speedDial};
     `,
+    placeholder: css`
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    `,
   };
 
   const user = useSelector((state) => state.user);
@@ -282,7 +289,12 @@ const Notes = ({ theme }) => {
           </div>
         ))}
       </Masonry>
+
       {/* TODO: Display a placeholder image or text if the notebook is empty, with a button for a new note */}
+      {filterState.filteredNotes.length < 1 && filterState.showOnly === FILTER_TYPES.ACTIVE && (
+        <NotesPagePlaceholder sx={styles.placeholder} />
+      )}
+
       <Zoom in={isPortrait}>
         <Fab
           color="primary"
