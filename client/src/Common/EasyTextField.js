@@ -39,6 +39,23 @@ const baseStyles = css`
   & .MuiInputLabel-root.MuiFormLabel-filled {
     transform: translate(18px, -20px) scale(0.75);
   }
+
+  @media only screen and (max-width: 600px) {
+    & .MuiOutlinedInput-input {
+      padding: 14.5px 18px;
+    }
+    & textarea.MuiOutlinedInput-input {
+      padding: 14.5px 18px;
+    }
+
+    & .MuiOutlinedInput-notchedOutline {
+      padding: 0 18px;
+    }
+
+    & .MuiInputLabel-root {
+      transform: translate(18px, 14px) scale(1);
+    }
+  }
 `;
 
 const EasyTextField = ({ sx, ...rest }) => {

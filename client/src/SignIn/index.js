@@ -52,26 +52,33 @@ const SignIn = ({ theme }) => {
       background-color: #f9f9f9;
     `,
     container: css`
-      position: relative;
+      min-height: 100vh;
+      padding-top: 1.5rem;
+      padding-bottom: 1.5rem;
+    `,
+    logo: css`
+      ${theme.breakpoints.down("sm")} {
+        font-size: ${theme.typography.h3.fontSize};
+      }
+    `,
+    formContainer: css`
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      padding: 2rem 1rem;
-    `,
-    logoWrapper: css`
-      position: absolute;
-      left: 2rem;
-      top: 1rem;
-    `,
-    formContainer: css`
       box-sizing: border-box;
-      min-width: 28rem;
-      margin: 4rem auto 10rem;
+      min-height: 100%;
+      margin: 18vh 0 10rem;
     `,
     form: css`
+      min-width: 26rem;
       & .icon-padding {
         padding-left: 3.4rem;
+      }
+      ${theme.breakpoints.down("sm")} {
+        min-width: 100%;
+        & .icon-padding {
+          padding-left: 2.4rem;
+        }
       }
     `,
     formHeadline: css`
@@ -83,6 +90,7 @@ const SignIn = ({ theme }) => {
     alert: css``,
     buttonWrapper: css`
       justify-content: space-around;
+      row-gap: 0.5rem;
       text-align: center;
       margin-top: 2.2rem;
     `,
@@ -103,6 +111,12 @@ const SignIn = ({ theme }) => {
         text-transform: uppercase;
       }
     `,
+    iconSx: {
+      color: "action.active",
+      mr: { xs: 1.5, sm: 2.5 },
+      my: { xs: 1.3, sm: 1.1 },
+      fontSize: { xs: theme.typography.h5.fontSize, sm: theme.typography.h4.fontSize },
+    },
   };
 
   const notification = useSelector((state) => state.notification);
@@ -162,8 +176,8 @@ const SignIn = ({ theme }) => {
   return (
     <div css={styles.root}>
       <Container sx={styles.container}>
-        <div css={styles.logoWrapper}>
-          <Logo variant="h2" textAlign="left" />
+        <div>
+          <Logo variant="h2" sx={styles.logo} />
         </div>
         <div css={styles.formContainer}>
           <form css={styles.form} onSubmit={handleSubmit}>
@@ -191,9 +205,7 @@ const SignIn = ({ theme }) => {
                 name="emailField"
                 label="Email užívateľa"
                 color="primary"
-                iconComponent={
-                  <Email fontSize="large" sx={{ color: "action.active", mr: 2.5, my: 1.1 }} />
-                }
+                iconComponent={<Email fontSize="large" sx={styles.iconSx} />}
                 onChange={(e) => setInput({ email: e.target.value })}
                 defaultValue={form.email}
                 error={isError("email")}
@@ -208,9 +220,7 @@ const SignIn = ({ theme }) => {
                 color="primary"
                 type="password"
                 autoComplete="current-password"
-                iconComponent={
-                  <Key fontSize="large" sx={{ color: "action.active", mr: 2.5, my: 1.1 }} />
-                }
+                iconComponent={<Key fontSize="large" sx={styles.iconSx} />}
                 onChange={(e) => setInput({ password: e.target.value })}
                 defaultValue={form.password}
                 error={isError("password")}

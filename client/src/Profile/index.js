@@ -12,9 +12,10 @@ const Profile = ({ theme }) => {
   const styles = {
     formsContainer: css`
       box-sizing: border-box;
+      min-height: 500px;
       max-width: 40rem;
       margin-left: 4rem;
-      padding: 0 2.5rem 2.5rem;
+      padding: 0 2.5rem 5rem;
 
       ${theme.breakpoints.down("md")} {
         margin: 0 auto;
@@ -95,7 +96,7 @@ const Profile = ({ theme }) => {
   }, [activeFormState, dispatch]);
 
   return (
-    <Container>
+    <Container sx={{ minHeight: "100%" }}>
       <PageTitle title="Edit Profile" linkTo="/" />
 
       <div css={styles.formsContainer}>

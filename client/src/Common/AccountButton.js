@@ -1,4 +1,5 @@
 import { css, useTheme } from "@emotion/react";
+import { AccountCircle, Logout } from "@mui/icons-material";
 import {
   Avatar,
   Dialog,
@@ -6,6 +7,8 @@ import {
   DialogTitle,
   IconButton,
   List,
+  ListItemIcon,
+  ListItemText,
   Menu,
   MenuItem,
   useMediaQuery,
@@ -16,14 +19,63 @@ import { useNavigate } from "react-router-dom";
 import EasyButtons from "./EasyButtons";
 
 const menuItems = [
-  { name: "Profile", linkTo: "/profile" },
-  { name: "Log out", linkTo: "/signout" },
+  { name: "Profile", linkTo: "/profile", icon: <AccountCircle fontSize="small" /> },
+  { name: "Log out", linkTo: "/signout", icon: <Logout fontSize="small" /> },
 ];
 
+const stringToColor = (string) => {
+  let hash = 0;
+  let i;
+
+  /* eslint-disable no-bitwise */
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  let color = "#";
+
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+  /* eslint-enable no-bitwise */
+
+  return color;
+};
+
 export default function AccountButton({ user }) {
+  const getAvatarAlt = (initOnly) => {
+    const { firstname, lastname, email } = user.data;
+    let result = "";
+    if (firstname || lastname) result = `${firstname || ""} ${lastname || ""}`;
+    else result = email;
+    if (initOnly) {
+      const strings = result.split(" ");
+      result = "";
+      for (let i = 0; i < Math.min(strings.length, 2); i++) result += strings[i][0];
+      return result;
+    }
+    return result;
+  };
+
   const theme = useTheme();
   const styles = {
-    avatar: { bgcolor: "primary.main", textTransform: "uppercase" },
+    avatar: {
+      width: "42px",
+      height: "42px",
+      boxSizing: "border-box",
+      border: `solid 2px rgba(0, 0, 0, 0.14)`,
+      bgcolor: stringToColor(getAvatarAlt()),
+      textTransform: "uppercase",
+      letterSpacing: "-0.4rem",
+      fontSize: "2.45rem",
+      fontWeight: "bold",
+      justifyContent: "center",
+      alignItems: "center",
+      "& span": {
+        ml: 0.2,
+      },
+    },
     dialogTitle: {
       display: "flex",
       flexDirection: "row",
@@ -51,6 +103,11 @@ export default function AccountButton({ user }) {
         overflow: hidden;
         text-overflow: ellipsis;
       }
+
+      .MuiList-root .MuiListItemText-root .MuiTypography-root {
+        font-size: inherit !important;
+        font-weight: inherit !important;
+      }
     `,
   };
 
@@ -61,11 +118,7 @@ export default function AccountButton({ user }) {
 
   const onAccountClick = (e) => setMenuAnchor(e.currentTarget);
   const onAccountClose = () => setMenuAnchor(null);
-  const getAvatarAlt = () => {
-    const { firstname, lastname, email } = user.data;
-    if (firstname || lastname) return `${firstname || ""} ${lastname || ""}`;
-    else return email;
-  };
+
   const onItemClick = (item) => {
     setMenuAnchor(null);
     navigate(item.linkTo);
@@ -74,7 +127,7 @@ export default function AccountButton({ user }) {
   // TODO: Change the static profile picture
   const renderDialogTitle = () => (
     <Box sx={styles.dialogTitle}>
-      <Avatar src="/dave.png" alt={getAvatarAlt()} sx={styles.avatar} />
+      <Avatar children={<span>{getAvatarAlt(true)}</span>} sx={styles.avatar} />
       <span className="DialogTitle-username">{getAvatarAlt()}</span>
     </Box>
   );
@@ -82,7 +135,8 @@ export default function AccountButton({ user }) {
   const renderMenuItems = (sx) =>
     menuItems.map((item) => (
       <MenuItem key={item.linkTo} sx={sx} onClick={() => onItemClick(item)}>
-        {item.name}
+        <ListItemIcon>{item.icon}</ListItemIcon>
+        <ListItemText>{item.name}</ListItemText>
       </MenuItem>
     ));
 
@@ -113,7 +167,7 @@ export default function AccountButton({ user }) {
         aria-haspopup="true"
         onClick={onAccountClick}
       >
-        <Avatar src="/dave.png" alt={getAvatarAlt()} sx={styles.avatar} />
+        <Avatar children={<span>{getAvatarAlt(true)}</span>} sx={styles.avatar} />
       </IconButton>
       <Menu
         id="menu-appbar"

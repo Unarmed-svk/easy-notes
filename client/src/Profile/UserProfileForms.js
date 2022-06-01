@@ -7,20 +7,33 @@ import EasyButtons from "../Common/EasyButtons";
 import { DebouncedIconField } from "../Common/EasyIconField";
 import { DebouncedTextField } from "../Common/EasyTextField";
 import useValidation from "../helpers/useValidation";
-import { useDispatch, useSelector } from "react-redux";
 
 const styles = {
   form: css`
-    & .icon-padding {
+    .icon-padding {
       padding-left: 3.4rem;
     }
-    & .icon-margin {
+    .icon-margin {
       margin-left: 3.4rem;
+    }
+    @media only screen and (max-width: 600px) {
+      .icon-padding {
+        padding-left: 2.3rem;
+      }
+      .icon-margin {
+        margin-left: 2.3rem;
+      }
     }
   `,
   iconField: css`
     width: 100%;
   `,
+  iconSx: {
+    color: "action.active",
+    mr: { xs: 1.5, sm: 2.5 },
+    my: { xs: 1.3, sm: 1.1 },
+    fontSize: { xs: "1.6rem", sm: "2.125rem" },
+  },
 };
 
 const defaultPasswordFormValues = {
@@ -88,7 +101,7 @@ export const PasswordChangeForm = ({
           label="Pôvodné heslo"
           color="primary"
           type="password"
-          iconComponent={<Key fontSize="large" sx={{ color: "action.active", mr: 2.5, my: 1.1 }} />}
+          iconComponent={<Key fontSize="large" sx={styles.iconSx} />}
           wrapperSX={styles.iconField}
           onChange={(e) => setInput({ password: e.target.value })}
           defaultValue={form.password}
@@ -194,9 +207,7 @@ export const DetailsChangeForm = ({
           name="firstnameField"
           label="Meno"
           color="primary"
-          iconComponent={
-            <AccountCircle fontSize="large" sx={{ color: "action.active", mr: 2.5, my: 1.1 }} />
-          }
+          iconComponent={<AccountCircle fontSize="large" sx={styles.iconSx} />}
           wrapperSX={styles.iconField}
           onChange={(e) => setInput({ firstname: e.target.value })}
           defaultValue={form.firstname}
