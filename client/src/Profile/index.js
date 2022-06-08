@@ -54,7 +54,7 @@ const Profile = ({ theme }) => {
   const [activeFormState, setActiveFormState] = useState({});
 
   const handleSubmitStart = (e, formID) => {
-    console.log(`Submission of ${formID} started`);
+    // console.log(`Submission of ${formID} started`);
     setIsLoading(true);
   };
 

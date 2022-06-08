@@ -18,7 +18,7 @@ import sk from "date-fns/locale/sk";
 import { AnimatePresence } from "framer-motion";
 import React, { useRef } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import UserButton from "./AccountButton";
+import AccountButton from "./AccountButton";
 import Slide from "./Animations/Slide";
 import SiteLogo from "./Logo";
 
@@ -133,7 +133,7 @@ const Layout = ({ theme, user }) => {
         <Toolbar sx={styles.toolbar} ref={toolbarRef}>
           {renderHeaderLeft()}
           <Typography className="user-name">{getUserName()}</Typography>
-          <UserButton user={user} theme={theme} />
+          {user.auth && <AccountButton user={user} theme={theme} />}
         </Toolbar>
       </AppBar>
 

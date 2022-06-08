@@ -43,10 +43,33 @@ const stringToColor = (string) => {
   return color;
 };
 
+const rgbSum = (hexColor) => {
+  const hexStr = hexColor.split("#")[1];
+  return (
+    parseInt(hexStr.substr(0, 2), 16) +
+    parseInt(hexStr.substr(2, 2), 16) +
+    parseInt(hexStr.substr(4, 2), 16)
+  );
+};
+
+const adjustBrightness = (hexColor, percent) => {
+  const hexStr = hexColor.split("#")[1];
+  const mult = percent * 0.01;
+
+  const r = parseInt(hexStr.substr(0, 2), 16),
+    g = parseInt(hexStr.substr(2, 2), 16),
+    b = parseInt(hexStr.substr(4, 2), 16);
+
+  return `rgb(${r + (256 - r * 0.5) * mult}, ${g + (256 - g * 0.5) * mult}, ${
+    b + (256 - b * 0.5) * mult
+  })`;
+};
+
 export default function AccountButton({ user }) {
   const getAvatarAlt = (initOnly) => {
     const { firstname, lastname, email } = user.data;
     let result = "";
+
     if (firstname || lastname) result = `${firstname || ""} ${lastname || ""}`;
     else result = email;
     if (initOnly) {
@@ -59,22 +82,24 @@ export default function AccountButton({ user }) {
   };
 
   const theme = useTheme();
+  const avatarInitials = getAvatarAlt(true);
+  const avatarBG = stringToColor(getAvatarAlt());
+  const useDarkColor = rgbSum(avatarBG) > 400;
+  const avatarSecondary = useDarkColor ? adjustBrightness(avatarBG, -75) : "white";
   const styles = {
     avatar: {
       width: "42px",
       height: "42px",
       boxSizing: "border-box",
-      border: `solid 2px rgba(0, 0, 0, 0.14)`,
-      bgcolor: stringToColor(getAvatarAlt()),
+      border: `solid 2px ${useDarkColor ? avatarSecondary : "rgba(0, 0, 0, 0.14)"}`,
+      bgcolor: avatarBG,
+      color: avatarSecondary,
       textTransform: "uppercase",
-      letterSpacing: "-0.4rem",
+      letterSpacing: avatarInitials.length > 1 ? "-0.4rem" : "auto",
       fontSize: "2.45rem",
       fontWeight: "bold",
       justifyContent: "center",
       alignItems: "center",
-      "& span": {
-        ml: 0.2,
-      },
     },
     dialogTitle: {
       display: "flex",
@@ -127,7 +152,7 @@ export default function AccountButton({ user }) {
   // TODO: Change the static profile picture
   const renderDialogTitle = () => (
     <Box sx={styles.dialogTitle}>
-      <Avatar children={<span>{getAvatarAlt(true)}</span>} sx={styles.avatar} />
+      <Avatar children={<span>{avatarInitials}</span>} sx={styles.avatar} />
       <span className="DialogTitle-username">{getAvatarAlt()}</span>
     </Box>
   );
@@ -167,7 +192,7 @@ export default function AccountButton({ user }) {
         aria-haspopup="true"
         onClick={onAccountClick}
       >
-        <Avatar children={<span>{getAvatarAlt(true)}</span>} sx={styles.avatar} />
+        <Avatar children={<span>{avatarInitials}</span>} sx={styles.avatar} />
       </IconButton>
       <Menu
         id="menu-appbar"
