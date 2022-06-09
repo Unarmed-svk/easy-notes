@@ -4,8 +4,9 @@ import { Link as RouterLink } from "react-router-dom";
 import { css, useTheme } from "@emotion/react";
 import EasyButtons from "../Common/EasyButtons";
 import { PlaylistAdd } from "@mui/icons-material";
+import { FILTER_TYPES } from "../helpers/consts";
 
-const NotesPagePlaceholder = ({ sx, ...rest }) => {
+const NotesPagePlaceholder = ({ statusFilter, sx, ...rest }) => {
   const theme = useTheme();
   // max-width: ${theme.breakpoints.values.sm}px;
 
@@ -17,7 +18,6 @@ const NotesPagePlaceholder = ({ sx, ...rest }) => {
       align-items: center;
       column-gap: 1.5rem;
       width: 100%;
-      max-width: 450px;
       padding: 0 4rem;
 
       .MuiTypography-h6 {
@@ -26,6 +26,7 @@ const NotesPagePlaceholder = ({ sx, ...rest }) => {
 
       & > img {
         max-width: 25%;
+        transform: scale(1.2, 1.2);
       }
 
       ${theme.breakpoints.down("sm")} {
@@ -43,24 +44,44 @@ const NotesPagePlaceholder = ({ sx, ...rest }) => {
     `,
   };
 
+  const isActiveStatus = statusFilter === FILTER_TYPES.ACTIVE;
+
+  const getPlaceholderText = () => {
+    switch (statusFilter) {
+      case FILTER_TYPES.ACTIVE:
+        return "Tvoj zápisník je prázdny!";
+      case FILTER_TYPES.COMPLETED:
+        return "Nemáš žiadne splnené úlohy.";
+      case FILTER_TYPES.DELETED:
+        return "Nemáš žiadne zmazané poznámky.";
+    }
+  };
+
   return (
     <Container
+      maxWidth="sm"
       sx={css`
         ${styles.container};
         ${sx}
       `}
       {...rest}
     >
-      <img src="/notebook-detailed.svg" alt="Notebook" />
+      {isActiveStatus && <img src="/notebook-shadow.svg" alt="Notebook" />}
       <div>
-        <Typography component="h5" variant="h6">
-          Tvoj zápisník je prázdny!
+        <Typography
+          component="h5"
+          variant="h6"
+          color={isActiveStatus ? "text.primary" : "text.disabled"}
+        >
+          {getPlaceholderText()}
         </Typography>
-        <Link to="/create" component={RouterLink}>
-          <EasyButtons.Outlined sx={styles.button} startIcon={<PlaylistAdd />}>
-            Pridaj novú poznámku
-          </EasyButtons.Outlined>
-        </Link>
+        {isActiveStatus && (
+          <Link to="/create" component={RouterLink}>
+            <EasyButtons.Outlined sx={styles.button} color="secondary" startIcon={<PlaylistAdd />}>
+              Pridaj novú poznámku
+            </EasyButtons.Outlined>
+          </Link>
+        )}
       </div>
     </Container>
   );

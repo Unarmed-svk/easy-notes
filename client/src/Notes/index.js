@@ -156,6 +156,12 @@ const Notes = ({ theme }) => {
       left: 50%;
       transform: translate(-50%, -50%);
     `,
+    filterDialog: css`
+      .MuiDialogContent-root {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    `,
   };
 
   const user = useSelector((state) => state.user);
@@ -164,6 +170,7 @@ const Notes = ({ theme }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const preferences = getPreferences(user.data._id);
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [showFilters, setShowFilters] = useState(preferences.filterOpen || false);
   const [noteDialogID, setNoteDialogID] = useState(null);
@@ -211,6 +218,10 @@ const Notes = ({ theme }) => {
     setNoteDialogID(null);
   };
 
+  const handleFilterDialogConfirm = () => {
+    setShowFilters(false);
+  };
+
   const handleAddNoteClick = () => navigate("/create");
 
   const closeDialog = () => setNoteDialogID(null);
@@ -253,15 +264,17 @@ const Notes = ({ theme }) => {
   return (
     <Container sx={styles.mainContainer}>
       <Stack direction="row" sx={styles.filterStack}>
-        <Collapse in={showFilters} sx={styles.filtersWrapper}>
-          <FiltersBar
-            values={filterState}
-            onChange={(data) => dispatchFilter(data)}
-            spacing={{ md: 5 }}
-            justifyContent="center"
-            alignItems="center"
-            sx={{ pt: "0.3rem", margin: "0.8rem 0 1.8rem" }}
-          />
+        <Collapse in={showFilters && !isMobile} sx={styles.filtersWrapper}>
+          {!isMobile && (
+            <FiltersBar
+              values={filterState}
+              onChange={(data) => dispatchFilter(data)}
+              spacing={{ md: 5 }}
+              justifyContent="center"
+              alignItems="center"
+              sx={{ pt: "0.3rem", margin: "0.8rem 0 1.8rem" }}
+            />
+          )}
         </Collapse>
 
         <EasyButtons.Text
@@ -290,9 +303,8 @@ const Notes = ({ theme }) => {
         ))}
       </Masonry>
 
-      {/* TODO: Display a placeholder image or text if the notebook is empty, with a button for a new note */}
-      {filterState.filteredNotes.length < 1 && filterState.showOnly === FILTER_TYPES.ACTIVE && (
-        <NotesPagePlaceholder sx={styles.placeholder} />
+      {filterState.filteredNotes.length < 1 && (
+        <NotesPagePlaceholder statusFilter={filterState.showOnly} sx={styles.placeholder} />
       )}
 
       <Zoom in={isPortrait}>
@@ -314,6 +326,28 @@ const Notes = ({ theme }) => {
         description="This action cannot be reverted."
         buttonNames={["Cancel", "Delete"]}
         buttonColors={["secondary", "error"]}
+      />
+
+      <EasyDialog
+        isOpen={showFilters && isMobile}
+        title="Set filters"
+        disableConfirm
+        buttonNames={["Close"]}
+        buttonColors={["secondary"]}
+        sx={styles.filterDialog}
+        onClose={() => setShowFilters(false)}
+        content={
+          <FiltersBar
+            values={filterState}
+            onChange={(data) => dispatchFilter(data)}
+            direction="row"
+            flexWrap="wrap"
+            spacing="4"
+            justifyContent="center"
+            alignItems="start"
+            sx={{ px: 0.6, mt: 0.5, mb: 0.8, rowGap: "1.6rem" }}
+          />
+        }
       />
     </Container>
   );

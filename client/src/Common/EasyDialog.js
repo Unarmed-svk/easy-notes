@@ -23,12 +23,16 @@ const dialogStyle = css`
 
 const EasyDialog = ({
   title,
+  content,
   description,
   buttonNames,
   buttonColors,
+  disableConfirm,
+  disableCancel,
   isOpen,
   onClose,
   onConfirm,
+  sx,
   ...rest
 }) => {
   return (
@@ -37,24 +41,34 @@ const EasyDialog = ({
       onClose={onClose}
       aria-labelledby="easy-dialog-title"
       aria-describedby="easy-dialog-description"
-      sx={dialogStyle}
+      sx={css`
+        ${dialogStyle}
+        ${sx}
+      `}
       {...rest}
     >
       <DialogTitle id="easy-dialog-title">{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText id="easy-dialog-description">{description}</DialogContentText>
+        {description && (
+          <DialogContentText id="easy-dialog-description">{description}</DialogContentText>
+        )}
+        {content}
       </DialogContent>
       <DialogActions>
-        <EasyButtons.Text color={buttonColors ? buttonColors[0] : "warning"} onClick={onClose}>
-          {buttonNames ? buttonNames[0] : "Cancel"}
-        </EasyButtons.Text>
-        <EasyButtons.Text
-          color={buttonColors ? buttonColors[1] : "success"}
-          onClick={onConfirm}
-          autoFocus
-        >
-          {buttonNames ? buttonNames[1] : "Confirm"}
-        </EasyButtons.Text>
+        {!disableCancel && (
+          <EasyButtons.Text color={buttonColors ? buttonColors[0] : "warning"} onClick={onClose}>
+            {buttonNames ? buttonNames[0] : "Cancel"}
+          </EasyButtons.Text>
+        )}
+        {!disableConfirm && (
+          <EasyButtons.Text
+            color={buttonColors ? buttonColors[1] : "success"}
+            onClick={onConfirm}
+            autoFocus
+          >
+            {buttonNames ? buttonNames[1] : "Confirm"}
+          </EasyButtons.Text>
+        )}
       </DialogActions>
     </Dialog>
   );
