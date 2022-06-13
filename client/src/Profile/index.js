@@ -99,6 +99,8 @@ const Profile = ({ theme }) => {
     <Container sx={{ minHeight: "100%" }}>
       <PageTitle title="Edit Profile" linkTo="/" />
 
+      {/* TODO: Maybe add some user statistics at the top */}
+
       <div css={styles.formsContainer}>
         <div css={styles.notificationContainer}>
           <Collapse in={notification.error || notification.success}>
@@ -144,7 +146,10 @@ const Profile = ({ theme }) => {
             onChange={handleFormChange}
           />
         </EasyAccordion>
+        {/* TODO: Add Change Email form and Delete Account form */}
       </div>
+
+      {/* TODO: Add Log Out button at the bottom */}
     </Container>
   );
 };

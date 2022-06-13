@@ -85,7 +85,6 @@ const filterReducer = (state, action) => {
       const isAsc =
         state.sortDate === FILTER_TYPES.NEWEST || state.sortDeadline === FILTER_TYPES.CLOSEST;
       const isSortDate = state.sortDate !== "";
-      //TODO: Check if the filter is set to sortDate or to sortDeadline
 
       const sorted = getFiltered(state.showOnly, payload).sort((a, b) =>
         isSortDate

@@ -174,28 +174,28 @@ const NoteCard = ({
     const theDate = new Date(dlTimestamp);
     const daysDiff = differenceInCalendarDays(theDate, startOfToday());
     let dateString = "";
-    let colorString = "neutral";
+    let bgColor = "neutral";
 
     if (daysDiff >= 0) {
       if (daysDiff === 0) {
         dateString = "Dnes";
-        colorString = "warning";
+        bgColor = "warning";
       } else if (daysDiff === 1) {
         dateString = "Zajtra";
-        colorString = "warning";
+        bgColor = "warning";
       } else dateString = format(theDate, "d. MMM RR", { locale: skLocale });
     } else {
       if (daysDiff === -1) {
         dateString = "Včera";
-        colorString = "error";
+        bgColor = "error";
       } else {
         dateString = format(theDate, "d. MMM RR", { locale: skLocale });
-        colorString = "error";
+        bgColor = "error";
       }
     }
-    if (status !== "active") colorString = "neutral";
+    if (status !== "active") bgColor = "neutral";
 
-    return <Chip color={colorString} size="small" icon={<TimerOutlined />} label={dateString} />;
+    return <Chip color={bgColor} size="small" icon={<TimerOutlined />} label={dateString} />;
   };
 
   const getTooltipText = (isFirst) => {

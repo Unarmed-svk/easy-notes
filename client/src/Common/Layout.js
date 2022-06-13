@@ -49,6 +49,7 @@ const Layout = ({ theme, user }) => {
       width: 100%;
       padding: ${theme.spacing(3)} 0;
       background-color: #f9f9f9;
+      overflow-x: hidden;
     `,
     drawer: css`
       display: block;
