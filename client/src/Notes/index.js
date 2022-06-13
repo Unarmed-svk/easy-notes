@@ -106,20 +106,37 @@ const Notes = ({ theme }) => {
   };
   const styles = {
     mainContainer: css`
-      padding-bottom: 1.5rem;
+      padding-bottom: 5rem;
 
-      ${theme.breakpoints.down("md")} {
-        padding-bottom: 5rem;
+      & .MuiFab-root {
+        position: fixed;
+        right: 2rem;
+        bottom: 1.8rem;
+        z-index: ${theme.zIndex.speedDial};
+      }
+
+      ${theme.breakpoints.up("md")} {
+        padding-bottom: 1.5rem;
+
+        & .MuiFab-root {
+          right: 2.5rem;
+          bottom: 3rem;
+        }
       }
     `,
     grid: css`
       display: flex;
-      margin-left: -30px;
       width: auto;
 
       & .notes-grid_column {
-        padding-left: 30px;
         background-clip: padding-box;
+      }
+
+      ${theme.breakpoints.up("md")} {
+        margin-left: -30px;
+        & .notes-grid_column {
+          padding-left: 30px;
+        }
       }
     `,
     item: css`
@@ -142,12 +159,6 @@ const Notes = ({ theme }) => {
       & .note-filters {
         justify-content: center;
       }
-    `,
-    faButton: css`
-      position: fixed;
-      right: 2.5rem;
-      bottom: 3rem;
-      z-index: ${theme.zIndex.speedDial};
     `,
     placeholder: css`
       position: absolute;
@@ -307,13 +318,7 @@ const Notes = ({ theme }) => {
       )}
 
       <Zoom in={isPortrait}>
-        <Fab
-          color="primary"
-          size="large"
-          sx={styles.faButton}
-          aria-label="add"
-          onClick={handleAddNoteClick}
-        >
+        <Fab color="primary" size="large" aria-label="add" onClick={handleAddNoteClick}>
           <PlaylistAdd />
         </Fab>
       </Zoom>

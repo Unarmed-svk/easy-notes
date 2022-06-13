@@ -74,6 +74,10 @@ const NoteCard = ({
         margin-top: 1rem;
       }
 
+      .MuiCardContent-root .NoteCard-statuses .MuiChip-root {
+        min-width: 5ch;
+      }
+
       .MuiCardContent-root .NoteCard-statuses .MuiIconButton-root {
         margin-left: 0.9rem;
       }
@@ -244,15 +248,13 @@ const NoteCard = ({
           subheader={renderSubheader()}
         />
         <CardContent sx={styles.content}>
-          <Typography variant="body2" className="NoteCard-content-item">
-            {description}
-          </Typography>
+          <Typography variant="body2">{description}</Typography>
           <Stack
             direction="row"
             spacing={1.5}
             justifyContent="start"
             alignItems="center"
-            className="NoteCard-statuses NoteCard-content-item"
+            className="NoteCard-statuses"
           >
             {status !== "active" && renderNoteStatus()}
             {renderNoteDeadline()}
