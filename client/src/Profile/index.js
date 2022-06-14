@@ -1,12 +1,15 @@
 import { css } from "@emotion/react";
-import { Alert, Collapse, Container } from "@mui/material";
+import { Alert, Collapse, Container, Link, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import EasyAccordion from "../Common/EasyAccordion";
+import EasyButtons from "../Common/EasyButtons";
 import PageTitle from "../Common/PageTitle";
 import { clearNotification } from "../store/actions";
 import { patchUserPassword, patchUserProfile } from "../store/actions/user.action";
 import { DetailsChangeForm, PasswordChangeForm } from "./UserProfileForms";
+import { DeleteOutlined, Logout } from "@mui/icons-material";
+import { Link as RouterLink } from "react-router-dom";
 
 const Profile = ({ theme }) => {
   const styles = {
@@ -42,6 +45,13 @@ const Profile = ({ theme }) => {
     notificationContainer: css`
       margin-bottom: 0.8rem;
       min-height: 3em;
+    `,
+    buttonsContainer: css`
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      max-width: 40rem;
+      margin-left: 4rem;
     `,
   };
 
@@ -149,7 +159,19 @@ const Profile = ({ theme }) => {
         {/* TODO: Add Change Email form and Delete Account form */}
       </div>
 
-      {/* TODO: Add Log Out button at the bottom */}
+      <Stack sx={styles.buttonsContainer}>
+        <Link to="/signout" underline="none" component={RouterLink}>
+          <EasyButtons.Outlined color="secondary" startIcon={<Logout />}>
+            Sign out
+          </EasyButtons.Outlined>
+        </Link>
+
+        {/* TODO: Make a RouterLink with delete accout parameter  */}
+
+        <EasyButtons.Text color="error" startIcon={<DeleteOutlined />}>
+          Delete Account
+        </EasyButtons.Text>
+      </Stack>
     </Container>
   );
 };

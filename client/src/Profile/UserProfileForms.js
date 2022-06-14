@@ -72,6 +72,7 @@ export const PasswordChangeForm = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (disableForm) return;
     onSubmitStart(e, formID);
     setTimeout(() => setShouldSubmit(true), 700);
   };
@@ -179,8 +180,8 @@ export const DetailsChangeForm = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (disableForm) return;
     onSubmitStart(e, formID);
-
     setTimeout(() => setShouldSubmit(true), 700);
   };
 

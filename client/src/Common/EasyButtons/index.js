@@ -136,6 +136,6 @@ const Sharp = React.forwardRef(function Sharp({ children, color, sx, ...rest }, 
   );
 });
 
-const EasyButtons = { Contained, Outlined, Loading, Text, IconButton, Sharp };
+const EasyButtons = { Contained, Outlined, Loading, Text, Sharp };
 
 export default EasyButtons;

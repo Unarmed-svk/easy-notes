@@ -9,5 +9,3 @@ export const UPDATE_NOTES = "update-note";
 export const ERROR_GLOBAL = "error-global";
 export const SUCCESS_GLOBAL = "success-global";
 export const CLEAR_NOTIFICATION = "clear-notification";
-
-export const UPDATE_FILTER_PREF = "update-filter-pref";

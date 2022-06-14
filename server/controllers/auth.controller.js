@@ -10,7 +10,10 @@ const authController = {
 
       // await emailService.registerEmail(email, user);
 
-      resp.cookie("x-access-token", token).status(status.CREATED).send({ user, token });
+      resp
+        .cookie("x-access-token", token)
+        .status(status.CREATED)
+        .send({ user, token, showIntro: true });
     } catch (err) {
       next(err);
     }

@@ -24,6 +24,7 @@ import { clearNotification } from "../store/actions";
 const initialFormValues = {
   email: "test@gmail.com",
   password: "test12345",
+  confirmPassword: "",
   firstname: "",
   lastname: "",
 };
@@ -36,8 +37,11 @@ const registerSchema = Yup.object().shape({
     .required("Heslo je povinný údaj")
     .min(8, "Heslo musí mať aspoň 8 znakov")
     .max(32, "Heslo nesmie mať viac ako 32 znakov"),
-  firstname: Yup.string(),
-  lastname: Yup.string(),
+  confirmPassword: Yup.string()
+    .required("Zopakujte heslo")
+    .oneOf([Yup.ref("password"), null], "Heslá nie sú zhodné"),
+  firstname: Yup.string().max(64, "Meno nesmie presahovať 64 znakov"),
+  lastname: Yup.string().max(64, "Priezvysko nesmie presahovať 64 znakov"),
 });
 
 const loginSchema = Yup.object().shape({
@@ -71,13 +75,20 @@ const SignIn = ({ theme }) => {
     `,
     form: css`
       min-width: 26rem;
-      & .icon-padding {
+      min-height: 35rem;
+      & .fields-padding {
+        padding-left: 3.4rem;
+      }
+      & .controls-padding {
         padding-left: 3.4rem;
       }
       ${theme.breakpoints.down("sm")} {
         min-width: 100%;
-        & .icon-padding {
+        & .fields-padding {
           padding-left: 2.4rem;
+        }
+        & .controls-padding {
+          padding-left: 0rem;
         }
       }
     `,
@@ -90,7 +101,7 @@ const SignIn = ({ theme }) => {
     alert: css``,
     buttonWrapper: css`
       justify-content: space-around;
-      row-gap: 0.5rem;
+      row-gap: 0.8rem;
       text-align: center;
       margin-top: 2.2rem;
     `,
@@ -110,6 +121,10 @@ const SignIn = ({ theme }) => {
         text-align: center;
         text-transform: uppercase;
       }
+    `,
+    confirmPass: css`
+      display: flex;
+      margin-top: ${theme.spacing(3.5)};
     `,
     iconSx: {
       color: "action.active",
@@ -138,6 +153,7 @@ const SignIn = ({ theme }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isLoading) return;
     setIsLoading(true);
     setTimeout(() => setShouldSubmit(true), 700);
   };
@@ -185,12 +201,12 @@ const SignIn = ({ theme }) => {
               variant="h5"
               component="h3"
               sx={styles.formHeadline}
-              className="icon-padding"
+              className="controls-padding"
             >
               {isRegister ? "Nový účet" : "Prihlásiť sa"}
             </Typography>
             <Stack direction="column" spacing={2.5}>
-              <Collapse in={formMessage.error || formMessage.success} className="icon-padding">
+              <Collapse in={formMessage.error || formMessage.success} className="fields-padding">
                 <Alert
                   variant="filled"
                   severity={formMessage.error ? "error" : "success"}
@@ -229,8 +245,23 @@ const SignIn = ({ theme }) => {
               />
             </Stack>
 
-            {isRegister && (
-              <FormControl fullWidth sx={styles.detailsContainer} className="icon-padding">
+            <Collapse in={isRegister} className="fields-padding">
+              <DebouncedTextField
+                required={isRegister}
+                fullWidth
+                id="confirmPassField"
+                name="confirmPassField"
+                label="Zopakovať heslo"
+                color="primary"
+                type="password"
+                onChange={(e) => setInput({ confirmPassword: e.target.value })}
+                defaultValue={form.confirmPassword}
+                error={isError("confirmPassword")}
+                helperText={errors.confirmPassword}
+                disabled={isLoading}
+                sx={styles.confirmPass}
+              />
+              <FormControl fullWidth sx={styles.detailsContainer}>
                 <FormLabel>Doplňujúce údaje</FormLabel>
                 <Stack direction="column" spacing={2.5} alignContent={"stretch"}>
                   <DebouncedTextField
@@ -251,12 +282,12 @@ const SignIn = ({ theme }) => {
                   />
                 </Stack>
               </FormControl>
-            )}
+            </Collapse>
 
             <Stack
               direction={{ xs: "column", sm: "row" }}
               sx={styles.buttonWrapper}
-              className="icon-padding"
+              className="controls-padding"
             >
               <EasyButtons.Outlined color="secondary" onClick={toggleFormType} disabled={isLoading}>
                 {isRegister ? "Prihlásenie" : "Nový účet"}

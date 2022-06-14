@@ -17,6 +17,7 @@ export const userRegister = ({ email, password, firstname, lastname }) => {
         actions.authUser({
           data: user.data.user,
           auth: true,
+          showIntro: user.data.showIntro,
         })
       );
       dispatch(actions.successGlobal("Registration successful"));

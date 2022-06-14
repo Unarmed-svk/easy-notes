@@ -7,7 +7,6 @@ import {
   SIGN_OUT,
   PATCH_PROFILE,
   UPDATE_NOTES,
-  UPDATE_FILTER_PREF,
 } from "../types";
 
 /*-------- AUTH ---------*/
@@ -62,10 +61,3 @@ export const clearNotification = () => {
     });
   };
 };
-
-/*-------- PREFERENCES ---------*/
-
-export const updateFilterPreference = ({ sortDate, sortDeadline, showOnly }, filterOpen) => ({
-  type: UPDATE_FILTER_PREF,
-  payload: { filterOpen, filterState: { sortDate, sortDeadline, showOnly } },
-});

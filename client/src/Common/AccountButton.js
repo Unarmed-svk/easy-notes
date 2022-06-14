@@ -75,7 +75,7 @@ export default function AccountButton({ user }) {
     if (initOnly) {
       const strings = result.split(" ");
       result = "";
-      for (let i = 0; i < Math.min(strings.length, 2); i++) result += strings[i][0];
+      for (let i = 0; i < Math.min(strings.length, 2); i++) result += strings[i][0] || "";
       return result;
     }
     return result;
@@ -116,17 +116,22 @@ export default function AccountButton({ user }) {
       .MuiDialogTitle-root {
         padding: 0.6rem 1.8rem 1rem 1.8rem;
         border-bottom: 1px solid ${theme.palette.divider};
+        max-width: 26ch;
       }
 
       .MuiDialogTitle-root .DialogTitle-username {
         display: block;
         flex-shrink: 0;
-        max-width: 85%;
+        max-width: min(75%, 20ch);
         font-size: 1.4rem;
         line-height: 1.3;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+      }
+
+      .MuiList-root .MuiListItemText-root {
+        flex: 0 1 auto;
       }
 
       .MuiList-root .MuiListItemText-root .MuiTypography-root {
@@ -139,7 +144,6 @@ export default function AccountButton({ user }) {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const navigate = useNavigate();
   const isTabletWide = useMediaQuery(theme.breakpoints.down("lg"));
-  // const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const onAccountClick = (e) => setMenuAnchor(e.currentTarget);
   const onAccountClose = () => setMenuAnchor(null);

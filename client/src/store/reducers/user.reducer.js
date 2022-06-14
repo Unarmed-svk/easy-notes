@@ -1,4 +1,3 @@
-import { FILTER_TYPES } from "../../helpers/consts";
 import { AUTH_USER, GET_NOTES, SIGN_OUT, PATCH_PROFILE, UPDATE_NOTES } from "../types";
 
 let DEFAULT_USER_STATE = {
@@ -11,6 +10,7 @@ let DEFAULT_USER_STATE = {
     verified: null,
   },
   auth: null,
+  showIntro: false,
 };
 
 export default function userReducer(state = DEFAULT_USER_STATE, action) {
@@ -20,6 +20,7 @@ export default function userReducer(state = DEFAULT_USER_STATE, action) {
         ...state,
         data: { ...state.data, ...action.payload.data },
         auth: action.payload.auth,
+        showIntro: action.payload.showIntro,
       };
     case SIGN_OUT:
       return {
