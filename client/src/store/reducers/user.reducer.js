@@ -1,11 +1,4 @@
-import {
-  AUTH_USER,
-  GET_NOTES,
-  SIGN_OUT,
-  PATCH_PROFILE,
-  UPDATE_NOTES,
-  DELETE_ACCOUNT,
-} from "../types";
+import { AUTH_USER, SIGN_OUT, PATCH_PROFILE, UPDATE_NOTES, DELETE_ACCOUNT } from "../types";
 
 let DEFAULT_USER_STATE = {
   data: {
@@ -14,7 +7,11 @@ let DEFAULT_USER_STATE = {
     firstname: null,
     lastname: null,
     notes: [],
+    notesCreated: 0,
+    notesCompleted: 0,
+    notesDeleted: 0,
     verified: null,
+    createdAt: null,
   },
   auth: null,
   showIntro: false,
@@ -46,10 +43,8 @@ export default function userReducer(state = DEFAULT_USER_STATE, action) {
         data: DEFAULT_USER_STATE.data,
         auth: false,
       };
-    case GET_NOTES:
-      return { ...state, notes: action.payload };
     case UPDATE_NOTES:
-      return { ...state, data: { ...state.data, notes: action.payload } };
+      return { ...state, data: { ...state.data, ...action.payload } };
     default:
       return state;
   }

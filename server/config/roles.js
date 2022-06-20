@@ -19,7 +19,7 @@ let grantsObj = {
       "delete:own": ["*"],
     },
     notes: {
-      "read:own": ["notes"],
+      "read:own": ["notes", "notesCreated", "notesCompleted", "notesDeleted"],
       "update:own": ["notes"],
       "delete:own": ["notes"],
     },

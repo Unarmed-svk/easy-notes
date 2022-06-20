@@ -1,13 +1,16 @@
+const { AccessControl } = require("accesscontrol");
 const httpStatus = require("http-status");
 const { ApiError } = require("../middleware/apiError");
 const { noteService, userService } = require("../services");
+
+const responseFilter = ["notes", "notesCreated", "notesCompleted", "notesDeleted"];
 
 const noteController = {
   async getNotes(req, resp, next) {
     try {
       const user = await userService.findUserById(req.user._id);
       if (!user) throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-      resp.json({ notes: user.notes });
+      resp.json(resp.locals.permission.filter(user._doc));
     } catch (err) {
       next(err);
     }
@@ -15,7 +18,7 @@ const noteController = {
   async createNote(req, resp, next) {
     try {
       const user = await noteService.createNote(req);
-      resp.json(resp.locals.permission.filter(user._doc));
+      resp.json(AccessControl.filter(user._doc, responseFilter));
     } catch (err) {
       next(err);
     }
@@ -23,11 +26,12 @@ const noteController = {
   async changeStatus(req, resp, next) {
     try {
       const user = await noteService.changeNoteStatus(req);
-      resp.json(resp.locals.permission.filter(user._doc));
+      resp.json(AccessControl.filter(user._doc, responseFilter));
     } catch (err) {
       next(err);
     }
   },
+
   // async completeNote(req, resp, next) {
   //   try {
   //     const user = await noteService.changeNoteStatus(req, "completed");
@@ -44,10 +48,11 @@ const noteController = {
   //     next(err);
   //   }
   // },
+
   async deleteNote(req, resp, next) {
     try {
       const user = await noteService.deleteNote(req);
-      resp.json(resp.locals.permission.filter(user._doc));
+      resp.json(AccessControl.filter(user._doc, responseFilter));
     } catch (err) {
       next(err);
     }

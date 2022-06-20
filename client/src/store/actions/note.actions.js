@@ -2,21 +2,6 @@ import axios from "axios";
 import { getAuthHeader } from "../../helpers/tools";
 import * as actions from "./index";
 
-// export const getAllNotes = () => {
-//   return async (dispatch) => {
-//     try {
-//       const notes = await axios.get("/api/brand/all", {
-//         limit: 2,
-//         order: "desc",
-//       });
-
-//       dispatch(actions.getAllNotes(notes.data));
-//     } catch (err) {
-//       console.log(err);
-//     }
-//   };
-// };
-
 export const createNote = ({ title, description, deadline, category }) => {
   return async (dispatch) => {
     try {
@@ -33,7 +18,7 @@ export const createNote = ({ title, description, deadline, category }) => {
         getAuthHeader()
       );
 
-      dispatch(actions.updateNotes(response.data.notes));
+      dispatch(actions.updateNotes(response.data));
       dispatch(actions.successGlobal("Note successfuly created", true));
     } catch (err) {
       dispatch(actions.errorGlobal(err.response.data.message, true));
@@ -50,7 +35,7 @@ export const patchNoteStatus = (id, status) => {
         getAuthHeader()
       );
 
-      dispatch(actions.updateNotes(response.data.notes));
+      dispatch(actions.updateNotes(response.data));
       switch (status) {
         case "active":
           dispatch(actions.successGlobal("Note marked as active", true));
@@ -76,7 +61,7 @@ export const retrieveNote = (id) => {
         { newstatus: "active" },
         getAuthHeader()
       );
-      dispatch(actions.updateNotes(response.data.notes));
+      dispatch(actions.updateNotes(response.data));
       dispatch(actions.successGlobal("Note successfuly retrieved", true));
     } catch (err) {
       dispatch(actions.errorGlobal(err.response.data.message, true));
@@ -89,7 +74,7 @@ export const deleteNote = (id) => {
     try {
       const response = await axios.delete(`/api/note/${id}`, getAuthHeader());
 
-      dispatch(actions.updateNotes(response.data.notes));
+      dispatch(actions.updateNotes(response.data));
       dispatch(actions.successGlobal("Note successfuly deleted", true));
     } catch (err) {
       dispatch(actions.errorGlobal(err.response.data.message, true));

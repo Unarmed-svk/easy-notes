@@ -1,7 +1,6 @@
 import {
   AUTH_USER,
   ERROR_GLOBAL,
-  GET_NOTES,
   SUCCESS_GLOBAL,
   CLEAR_NOTIFICATION,
   SIGN_OUT,
@@ -37,14 +36,9 @@ export const deleteAccount = () => ({
 //   payload: passwords,
 // });
 
-export const getAllNotes = (data) => ({
-  type: GET_NOTES,
-  payload: data,
-});
-
-export const updateNotes = (notes) => ({
+export const updateNotes = (data) => ({
   type: UPDATE_NOTES,
-  payload: notes,
+  payload: data,
 });
 
 /*-------- NOTIFICATIONS ---------*/

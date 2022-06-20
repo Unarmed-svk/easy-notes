@@ -1,6 +1,8 @@
 import { css } from "@emotion/react";
 import { DeleteOutlined, Logout } from "@mui/icons-material";
-import { Alert, Collapse, Container, Link, Stack } from "@mui/material";
+import { Alert, Collapse, Container, Grid, Link, Stack, Typography } from "@mui/material";
+import { format } from "date-fns";
+import sk from "date-fns/locale/sk";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link as RouterLink, useSearchParams } from "react-router-dom";
@@ -13,6 +15,7 @@ import {
   patchUserPassword,
   patchUserProfile,
 } from "../store/actions/user.action";
+import Stat from "./Stat";
 import { DeleteConfirmDialog, DetailsChangeForm, PasswordChangeForm } from "./UserProfileForms";
 
 const Profile = ({ theme }) => {
@@ -44,6 +47,11 @@ const Profile = ({ theme }) => {
       .MuiModal-root .MuiDialogContent-root #easy-dialog-description {
         color: #f00 !important;
       }
+
+      & .UserStatistics-container {
+        margin-top: 1rem;
+      }
+
       ${theme.breakpoints.up("xl")} {
         padding-bottom: 10rem;
         & .FormsContainer {
@@ -60,6 +68,9 @@ const Profile = ({ theme }) => {
         }
         & .ButtonsContainer {
           padding: 0 4rem;
+        }
+        & .UserStatistics-container {
+          padding: 0 2rem;
         }
       }
     `,
@@ -84,7 +95,6 @@ const Profile = ({ theme }) => {
   };
 
   const [searchParams, setSearchParams] = useSearchParams();
-  // console.log(searchParams);
   const notification = useSelector((state) => state.notification);
   const user = useSelector((state) => state.user.data);
   const dispatch = useDispatch();
@@ -121,6 +131,9 @@ const Profile = ({ theme }) => {
     setSearchParams({});
   };
 
+  const getCreatedAtFormat = () =>
+    user.createdAt ? format(new Date(user.createdAt), "do MMMM Y", { locale: sk }) : "??";
+
   useEffect(() => {
     if (notification.success) {
     } else if (notification.error) {
@@ -141,9 +154,28 @@ const Profile = ({ theme }) => {
 
   return (
     <Container sx={styles.mainContainer}>
-      <PageTitle title="Edit Profile" linkTo="/" />
+      <PageTitle title="Profil" linkTo="/" />
 
       {/* TODO: Maybe add some user statistics at the top */}
+
+      <Grid container spacing={{ xs: 6, sm: 4 }} className="UserStatistics-container">
+        <Grid item xs={12} sm={6}>
+          <Stat title="Účet založený" value={getCreatedAtFormat()} />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Stat
+            title={`Email (${user.verified ? "potvrdený" : "nepotvrdený"})`}
+            value={user.email}
+            color={user.verified ? "primary" : "warning.dark"}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Stat title="Vytvorené poznámky" value={user.notesCreated} fontSize={"1.6rem"} />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Stat title="Splnené úlohy" value={user.notesCompleted} fontSize={"1.6rem"} />
+        </Grid>
+      </Grid>
 
       <div className="FormsContainer">
         <div css={styles.notificationContainer}>
@@ -160,7 +192,7 @@ const Profile = ({ theme }) => {
         <EasyAccordion
           id="p1"
           expanded={isExpanded === "p1"}
-          summary="Edit Profile"
+          summary="Upraviť Profil"
           accordionSx={styles.accordion}
           onChange={handleChange}
           className="FirstAccordion"
@@ -177,7 +209,7 @@ const Profile = ({ theme }) => {
         <EasyAccordion
           id="p2"
           expanded={isExpanded === "p2"}
-          summary="Change Password"
+          summary="Zmeniť Heslo"
           accordionSx={styles.accordion}
           onChange={handleChange}
         >
@@ -198,12 +230,12 @@ const Profile = ({ theme }) => {
       >
         <Link to="/signout" underline="none" component={RouterLink}>
           <EasyButtons.Outlined color="secondary" startIcon={<Logout />}>
-            Sign out
+            Odhlásiť sa
           </EasyButtons.Outlined>
         </Link>
         <Link to="?delete=true" underline="none" component={RouterLink}>
           <EasyButtons.Text color="error" startIcon={<DeleteOutlined />}>
-            Delete Account
+            Zmazať Účet
           </EasyButtons.Text>
         </Link>
       </Stack>

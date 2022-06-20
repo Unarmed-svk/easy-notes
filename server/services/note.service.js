@@ -24,6 +24,8 @@ const createNote = async (req) => {
       category: newNote.category,
       deadline: newNote.deadline,
     });
+    user.notesCreated += 1;
+
     return await user.save();
   } catch (err) {
     throw err;
@@ -35,6 +37,23 @@ const changeNoteStatus = async (req) => {
     const { user, note } = await getUserAndNote(req.user._id, req.params.id);
     const newStatus = req.body.newstatus;
     if (!newStatus) throw new ApiError(httpStatus.BAD_REQUEST, "Note status is missing");
+
+    switch (newStatus) {
+      case "active": {
+        if (note.status === "completed") user.notesCompleted -= 1;
+        else if (note.status === "deleted") user.notesDeleted -= 1;
+        break;
+      }
+      case "completed": {
+        user.notesCompleted += 1;
+        break;
+      }
+      case "deleted": {
+        user.notesDeleted += 1;
+        break;
+      }
+    }
+
     note.status = newStatus;
 
     return await user.save();

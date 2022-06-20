@@ -5,46 +5,61 @@ const jwt = require("jsonwebtoken");
 const { noteSchema } = require("./note");
 require("dotenv").config();
 
-const userSchema = mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error("Invalid email");
-      }
+const userSchema = mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email");
+        }
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+    firstname: {
+      type: String,
+      maxLength: 100,
+      trim: true,
+      default: "",
+    },
+    lastname: {
+      type: String,
+      maxLength: 100,
+      trim: true,
+      default: "",
+    },
+    notes: [noteSchema],
+    notesCreated: {
+      type: Number,
+      default: 0,
+    },
+    notesCompleted: {
+      type: Number,
+      default: 0,
+    },
+    notesDeleted: {
+      type: Number,
+      default: 0,
+    },
+    verified: {
+      type: Boolean,
+      default: false,
     },
   },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  role: {
-    type: String,
-    enum: ["user", "admin"],
-    default: "user",
-  },
-  firstname: {
-    type: String,
-    maxLength: 100,
-    trim: true,
-    default: "",
-  },
-  lastname: {
-    type: String,
-    maxLength: 100,
-    trim: true,
-    default: "",
-  },
-  notes: [noteSchema],
-  verified: {
-    type: Boolean,
-    default: false,
-  },
-});
+  { timestamps: { createdAt: true, updatedAt: false } }
+);
 
 userSchema.pre("save", async function (next) {
   let user = this;

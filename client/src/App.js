@@ -25,6 +25,7 @@ const theme = createTheme({
     },
     secondary: {
       main: "#ae9b66",
+      dark: "#886641",
     },
     neutral: {
       main: "rgba(0, 0, 0, 0.42)",
@@ -114,7 +115,7 @@ const App = () => {
         <EasyToast
           open={toastMessage.open}
           message={toastMessage.message}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={4000}
           severity={toastMessage.error ? "error" : "success"}
           onClose={handleToastClose}
