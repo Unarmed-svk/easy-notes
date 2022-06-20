@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getTokenCookie, getAuthHeader, removeTokenCookie } from "../../helpers/tools";
+import { getTokenCookie, getAuthHeader, removeTokenCookie, getAuth } from "../../helpers/tools";
 import * as actions from "./index";
 
 axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -123,6 +123,23 @@ export const patchUserPassword = ({ password, newpassword }) => {
       }
     } catch (err) {
       dispatch(actions.errorGlobal(err.response.data.message));
+    }
+  };
+};
+
+export const deleteUserAccount = ({ password }) => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.delete("/api/user/profile", {
+        headers: getAuth(),
+        data: { password },
+      });
+      if (response.data) {
+        dispatch(actions.deleteAccount());
+        dispatch(actions.successGlobal("Your account was deleted", true));
+      }
+    } catch (err) {
+      dispatch(actions.errorGlobal(err.response.data.message, true));
     }
   };
 };

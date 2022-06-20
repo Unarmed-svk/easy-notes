@@ -1,31 +1,66 @@
 import { css } from "@emotion/react";
+import { DeleteOutlined, Logout } from "@mui/icons-material";
 import { Alert, Collapse, Container, Link, Stack } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link as RouterLink, useSearchParams } from "react-router-dom";
 import EasyAccordion from "../Common/EasyAccordion";
 import EasyButtons from "../Common/EasyButtons";
 import PageTitle from "../Common/PageTitle";
 import { clearNotification } from "../store/actions";
-import { patchUserPassword, patchUserProfile } from "../store/actions/user.action";
-import { DetailsChangeForm, PasswordChangeForm } from "./UserProfileForms";
-import { DeleteOutlined, Logout } from "@mui/icons-material";
-import { Link as RouterLink } from "react-router-dom";
+import {
+  deleteUserAccount,
+  patchUserPassword,
+  patchUserProfile,
+} from "../store/actions/user.action";
+import { DeleteConfirmDialog, DetailsChangeForm, PasswordChangeForm } from "./UserProfileForms";
 
 const Profile = ({ theme }) => {
   const styles = {
-    formsContainer: css`
-      box-sizing: border-box;
-      min-height: 500px;
-      max-width: 40rem;
-      margin-left: 4rem;
-      padding: 0 2.5rem 5rem;
+    mainContainer: css`
+      position: relative;
+      min-height: 100%;
+      padding-bottom: 6rem;
 
-      ${theme.breakpoints.down("md")} {
+      & .FormsContainer {
+        box-sizing: border-box;
+        min-height: 500px;
+        max-width: 40rem;
         margin: 0 auto;
+        padding-bottom: 5rem;
       }
-      ${theme.breakpoints.down("sm")} {
-        padding-left: 0;
-        padding-right: 0;
+
+      & .ButtonsContainer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        row-gap: 1.2rem;
+        column-gap: 1rem;
+      }
+
+      .MuiModal-root .MuiDialogContent-root #easy-dialog-description {
+        color: #f00 !important;
+      }
+      ${theme.breakpoints.up("xl")} {
+        padding-bottom: 10rem;
+        & .FormsContainer {
+          margin-left: 4rem;
+        }
+        & .ButtonsContainer {
+          padding-bottom: 8rem;
+        }
+      }
+      ${theme.breakpoints.up("sm")} {
+        & .FormsContainer {
+          padding-left: 2.5rem;
+          padding-right: 2.5rem;
+        }
+        & .ButtonsContainer {
+          padding: 0 4rem;
+        }
       }
     `,
     accordion: css`
@@ -46,15 +81,10 @@ const Profile = ({ theme }) => {
       margin-bottom: 0.8rem;
       min-height: 3em;
     `,
-    buttonsContainer: css`
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      max-width: 40rem;
-      margin-left: 4rem;
-    `,
   };
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  // console.log(searchParams);
   const notification = useSelector((state) => state.notification);
   const user = useSelector((state) => state.user.data);
   const dispatch = useDispatch();
@@ -63,14 +93,9 @@ const Profile = ({ theme }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeFormState, setActiveFormState] = useState({});
 
-  const handleSubmitStart = (e, formID) => {
-    // console.log(`Submission of ${formID} started`);
-    setIsLoading(true);
-  };
+  const handleSubmitStart = () => setIsLoading(true);
 
   const handleSubmit = (formID, formData) => {
-    // console.log(`Form ${formID} was submitted`, formData);
-
     switch (formID) {
       case "details":
         dispatch(patchUserProfile(formData));
@@ -78,6 +103,11 @@ const Profile = ({ theme }) => {
       case "password":
         dispatch(patchUserPassword(formData));
         break;
+      case "deletePermanently":
+        dispatch(deleteUserAccount(formData));
+        break;
+      default:
+        console.error(`Incorrect formID: ${formID} in Profile submit handler`);
     }
 
     setIsLoading(false);
@@ -86,6 +116,10 @@ const Profile = ({ theme }) => {
   const handleFormChange = (formID, formData) => setActiveFormState(formData);
 
   const handleChange = (panelId, event, isExpanded) => setIsExpanded(isExpanded ? panelId : false);
+
+  const handleCloseDialog = () => {
+    setSearchParams({});
+  };
 
   useEffect(() => {
     if (notification.success) {
@@ -106,12 +140,12 @@ const Profile = ({ theme }) => {
   }, [activeFormState, dispatch]);
 
   return (
-    <Container sx={{ minHeight: "100%" }}>
+    <Container sx={styles.mainContainer}>
       <PageTitle title="Edit Profile" linkTo="/" />
 
       {/* TODO: Maybe add some user statistics at the top */}
 
-      <div css={styles.formsContainer}>
+      <div className="FormsContainer">
         <div css={styles.notificationContainer}>
           <Collapse in={notification.error || notification.success}>
             <Alert
@@ -123,7 +157,6 @@ const Profile = ({ theme }) => {
             </Alert>
           </Collapse>
         </div>
-
         <EasyAccordion
           id="p1"
           expanded={isExpanded === "p1"}
@@ -156,22 +189,34 @@ const Profile = ({ theme }) => {
             onChange={handleFormChange}
           />
         </EasyAccordion>
-        {/* TODO: Add Change Email form and Delete Account form */}
+        {/* TODO: Add Change Email form */}
       </div>
-
-      <Stack sx={styles.buttonsContainer}>
+      <Stack
+        className="ButtonsContainer"
+        flexDirection={{ xs: "column", sm: "row" }}
+        alignItems={{ xs: "center", sm: "start" }}
+      >
         <Link to="/signout" underline="none" component={RouterLink}>
           <EasyButtons.Outlined color="secondary" startIcon={<Logout />}>
             Sign out
           </EasyButtons.Outlined>
         </Link>
-
-        {/* TODO: Make a RouterLink with delete accout parameter  */}
-
-        <EasyButtons.Text color="error" startIcon={<DeleteOutlined />}>
-          Delete Account
-        </EasyButtons.Text>
+        <Link to="?delete=true" underline="none" component={RouterLink}>
+          <EasyButtons.Text color="error" startIcon={<DeleteOutlined />}>
+            Delete Account
+          </EasyButtons.Text>
+        </Link>
       </Stack>
+
+      <DeleteConfirmDialog
+        formID="deletePermanently"
+        isOpen={searchParams.get("delete") === "true"}
+        onClose={handleCloseDialog}
+        isDisabled={isLoading}
+        onSubmitStart={handleSubmitStart}
+        onSubmit={handleSubmit}
+        onChange={handleFormChange}
+      />
     </Container>
   );
 };

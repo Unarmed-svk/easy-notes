@@ -5,6 +5,9 @@ export const removeTokenCookie = () => cookie.remove("x-access-token", { path: "
 export const getAuthHeader = () => {
   return { headers: { Authorization: `Bearer ${getTokenCookie()}` } };
 };
+export const getAuth = () => {
+  return { Authorization: `Bearer ${getTokenCookie()}` };
+};
 
 export const getPreferences = (userID) => {
   const value = localStorage.getItem(`pref${userID.slice(-6)}`);

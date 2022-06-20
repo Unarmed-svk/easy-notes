@@ -78,11 +78,29 @@ const updateUserPassword = async (req) => {
   }
 };
 
+const deleteUserAccount = async (req) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+
+    const { password } = req.body;
+    if (!(await user.comparePassword(password)))
+      throw new ApiError(httpStatus.UNAUTHORIZED, "Sorry, bad password");
+
+    await User.deleteOne({ _id: req.user._id });
+
+    return user;
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = {
   findUserByEmail,
   findUserById,
   updateUserProfile,
   updateUserEmail,
   updateUserPassword,
+  deleteUserAccount,
   validateToken,
 };

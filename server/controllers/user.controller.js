@@ -42,6 +42,15 @@ const userController = {
       next(err);
     }
   },
+  async deleteUserAccount(req, resp, next) {
+    try {
+      const user = await userService.deleteUserAccount(req);
+      resp.json(resp.locals.permission.filter(user._doc));
+    } catch (err) {
+      next(err);
+    }
+  },
+
   async verifyAccount(req, resp, next) {
     try {
       const token = await userService.validateToken(req.query.validation);

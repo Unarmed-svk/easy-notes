@@ -7,6 +7,7 @@ import {
   SIGN_OUT,
   PATCH_PROFILE,
   UPDATE_NOTES,
+  DELETE_ACCOUNT,
 } from "../types";
 
 /*-------- AUTH ---------*/
@@ -25,6 +26,10 @@ export const userSignOut = () => ({
 export const patchProfile = (profile) => ({
   type: PATCH_PROFILE,
   payload: profile,
+});
+
+export const deleteAccount = () => ({
+  type: DELETE_ACCOUNT,
 });
 
 // export const patchPassword = (passwords) => ({
