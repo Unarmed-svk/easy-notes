@@ -7,6 +7,7 @@ import {
   PATCH_PROFILE,
   UPDATE_NOTES,
   DELETE_ACCOUNT,
+  SET_SHOW_INTRO,
 } from "../types";
 
 /*-------- AUTH ---------*/
@@ -39,6 +40,11 @@ export const deleteAccount = () => ({
 export const updateNotes = (data) => ({
   type: UPDATE_NOTES,
   payload: data,
+});
+
+export const setShowIntro = (showIntro) => ({
+  type: SET_SHOW_INTRO,
+  payload: showIntro,
 });
 
 /*-------- NOTIFICATIONS ---------*/

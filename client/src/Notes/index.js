@@ -5,7 +5,7 @@ import Masonry from "react-masonry-css";
 import NoteCard from "./NoteCard";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteNote, patchNoteStatus, retrieveNote } from "../store/actions/note.actions";
-import { clearNotification } from "../store/actions";
+import { clearNotification, setShowIntro } from "../store/actions";
 import { FILTER_TYPES } from "../helpers/consts";
 import FiltersBar from "./FiltersBar";
 import { FilterAlt, PlaylistAdd } from "@mui/icons-material";
@@ -13,8 +13,9 @@ import EasyButtons from "../Common/EasyButtons";
 import { parseISO } from "date-fns";
 import EasyDialog from "../Common/EasyDialog";
 import { getPreferences, savePreferences } from "../helpers/tools";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import NotesPagePlaceholder from "./NotesPagePlaceholder";
+import IntroDialogContent from "./IntroDialogContent";
 
 const DEFAULT_FILTER_STATE = {
   sortDate: FILTER_TYPES.NEWEST,
@@ -172,13 +173,24 @@ const Notes = ({ theme }) => {
         padding-right: 0;
       }
     `,
+    introDialog: css`
+      .MuiDialogTitle-root {
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+        font-weight: 700;
+      }
+      .MuiDialogContent-root {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    `,
   };
 
   const user = useSelector((state) => state.user);
-  // const filterPreference = useSelector((state) => state.preferences);
   const notification = useSelector((state) => state.notification);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const preferences = getPreferences(user.data._id);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -228,10 +240,6 @@ const Notes = ({ theme }) => {
     setNoteDialogID(null);
   };
 
-  const handleFilterDialogConfirm = () => {
-    setShowFilters(false);
-  };
-
   const handleAddNoteClick = () => navigate("/create");
 
   const closeDialog = () => setNoteDialogID(null);
@@ -261,13 +269,11 @@ const Notes = ({ theme }) => {
 
   useEffect(() => {
     return () => {
-      // console.log(`DISPATCH FILTER`, filterState);
       const { sortDate, sortDeadline, showOnly } = filterState;
       savePreferences(user.data._id, {
         filterOpen: showFilters,
         filterState: { sortDate, sortDeadline, showOnly },
       });
-      // dispatch(updateFilterPreference(filterState, showFilters));
     };
   }, [dispatch, filterState, showFilters]);
 
@@ -293,7 +299,7 @@ const Notes = ({ theme }) => {
           startIcon={<FilterAlt />}
           onClick={() => setShowFilters(!showFilters)}
         >
-          Filter
+          Filtrovať
         </EasyButtons.Text>
       </Stack>
       <Masonry
@@ -323,7 +329,7 @@ const Notes = ({ theme }) => {
         </Fab>
       </Zoom>
       <EasyDialog
-        isOpen={noteDialogID !== null}
+        isOpen={noteDialogID !== null && !user.showIntro}
         onClose={closeDialog}
         onConfirm={handleDeleteConfirm}
         title="Delete the note permanently?"
@@ -333,8 +339,8 @@ const Notes = ({ theme }) => {
       />
 
       <EasyDialog
-        isOpen={showFilters && isMobile}
-        title="Set filters"
+        isOpen={showFilters && isMobile && !user.showIntro}
+        title="Nastaviť filtre"
         disableConfirm
         buttonNames={["Close"]}
         buttonColors={["secondary"]}
@@ -352,6 +358,17 @@ const Notes = ({ theme }) => {
             sx={{ px: 0.6, mt: 0.5, mb: 0.8, rowGap: "1.6rem" }}
           />
         }
+      />
+
+      <EasyDialog
+        isOpen={user.showIntro}
+        title="Vitajte v Easy Notes"
+        disableCancel
+        buttonNames={["", "Ok!"]}
+        sx={styles.introDialog}
+        onClose={() => dispatch(setShowIntro(false))}
+        onConfirm={() => dispatch(setShowIntro(false))}
+        content={<IntroDialogContent userEmail={user.data.email} />}
       />
     </Container>
   );

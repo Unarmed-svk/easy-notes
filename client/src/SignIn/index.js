@@ -161,7 +161,7 @@ const SignIn = ({ theme }) => {
   useEffect(() => {
     if (notification.success) {
       setTimeout(() => {
-        navigate("../");
+        navigate(`../?verifyEmail=true`);
       }, 1000);
       setFormMessage(notification);
       dispatch(clearNotification());
@@ -285,7 +285,7 @@ const SignIn = ({ theme }) => {
             </Collapse>
 
             <Stack
-              direction={{ xs: "column", sm: "row" }}
+              direction={{ xs: "column-reverse", sm: "row" }}
               sx={styles.buttonWrapper}
               className="controls-padding"
             >
