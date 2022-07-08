@@ -17,6 +17,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import skLocale from "date-fns/locale/sk";
 import "./App.css";
+import AnimTest from "./AnimTest";
 
 const theme = createTheme({
   palette: {
@@ -100,6 +101,7 @@ const App = () => {
                 <Route path="create" element={guard(<Create theme={theme} />)} />
                 <Route path="profile" element={guard(<Profile theme={theme} />)} />
                 <Route path="signout" element={<SignOut theme={theme} />} />
+                <Route path="test" element={<AnimTest />} />
               </Route>
               <Route
                 path="/signin"
@@ -183,4 +185,3 @@ const EasyAlert = React.forwardRef(function EasyAlert(props, ref) {
 export default App;
 
 // TODO: Change all english texts into slovak.
-// TODO: Futher optimise for mobile screens.

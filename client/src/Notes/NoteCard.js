@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import React from "react";
+import React, { useState } from "react";
 import { css } from "@emotion/react";
 import { useTheme } from "@mui/system";
 import { blue, green, orange, red } from "@mui/material/colors";
@@ -34,6 +34,9 @@ const NoteCard = ({
   category,
   status,
   createdAt,
+  actionState,
+  presenceState,
+  timeout,
   onFirstAction,
   onSecondAction,
 }) => {
@@ -58,6 +61,8 @@ const NoteCard = ({
       position: relative;
       border-radius: 1.4rem;
       box-shadow: ${theme.softShadow[1]};
+      transition-property: opacity;
+      transition-timing-function: ease-in-out
       z-index: 1;
 
       .MuiCardHeader-content > .MuiCardHeader-subheader {
@@ -86,16 +91,20 @@ const NoteCard = ({
         flex: 1 1 auto;
       }
 
-      &:not(.note-active):after {
+      & .NoteCard-overlay {
         content: " ";
-        box-sizing: content-box;
         position: absolute;
         top: 0;
         left: 0;
-        width: calc(100% - 10px);
-        height: calc(100% - 10px);
+        right: 0;
+        height: 100%;
         border-radius: inherit;
         pointer-events: none;
+        z-index: 500;
+      }
+
+      &:not(.action-none) .NoteCard-overlay {
+        pointer-events: auto;
       }
 
       &:not(.note-active) .MuiAvatar-root:after {
@@ -135,6 +144,22 @@ const NoteCard = ({
       }
     `,
   };
+
+  // &.note-entering {
+  //   opacity: 0;
+  //   transition-duration: ${timeout.cssEnter}ms;
+  // }
+  // &.note-entered {
+  //   opacity: 1;
+  //   transition-duration: ${timeout.cssEnter}ms;
+  // }
+  // &.note-exiting {
+  //   opacity: 0;
+  //   transition-duration: ${timeout.exit}ms;
+  // }
+  // &.note-exited {
+  //   opacity: 0;
+  // }
 
   const getCategoryName = (cat) => {
     switch (cat) {
@@ -240,7 +265,7 @@ const NoteCard = ({
 
   return (
     <div css={styles.cardContainer} className="NoteCard-container">
-      <Card sx={styles.card} className={`note-${status || ""}`}>
+      <Card sx={styles.card} className={`note-${status || ""} note-${presenceState}`}>
         <CardHeader
           avatar={<Avatar sx={styles.avatar}>{getCategoryName(category)[0]}</Avatar>}
           title={title}
@@ -281,6 +306,12 @@ const NoteCard = ({
             )}
           </Stack>
         </CardContent>
+        {/* <motion.div
+          className="NoteCard-overlay"
+          variants={overlayVariants}
+          initial={false}
+          transition={{ ease: "easeOut" }}
+        /> */}
       </Card>
     </div>
   );

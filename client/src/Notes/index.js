@@ -1,7 +1,7 @@
 import { Collapse, Container, Fab, Stack, useMediaQuery, Zoom } from "@mui/material";
+import Masonry from "@mui/lab/Masonry";
 import React, { useEffect, useReducer, useState } from "react";
 import { css } from "@emotion/react";
-import Masonry from "react-masonry-css";
 import NoteCard from "./NoteCard";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteNote, patchNoteStatus, retrieveNote } from "../store/actions/note.actions";
@@ -13,14 +13,20 @@ import EasyButtons from "../Common/EasyButtons";
 import { parseISO } from "date-fns";
 import EasyDialog from "../Common/EasyDialog";
 import { getPreferences, savePreferences } from "../helpers/tools";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import NotesPagePlaceholder from "./NotesPagePlaceholder";
 import IntroDialogContent from "./IntroDialogContent";
+import { Transition } from "react-transition-group";
 
 const DEFAULT_FILTER_STATE = {
   sortDate: FILTER_TYPES.NEWEST,
   sortDeadline: "",
   showOnly: FILTER_TYPES.ACTIVE,
+};
+
+const animationDurations = {
+  enter: 0,
+  exit: 200,
 };
 
 const getFilterState = (preferences) => {
@@ -50,49 +56,87 @@ const getFiltered = (filtersState, notes) => {
   return notes.filter((note) => note.status === filtersState);
 };
 
+const separateByStatus = (notes) => {
+  const active = [],
+    completed = [],
+    deleted = [];
+  notes.forEach((note) => {
+    switch (note.status) {
+      case "active":
+        active.push(note);
+        break;
+      case "completed":
+        completed.push(note);
+        break;
+      case "deleted":
+        deleted.push(note);
+        break;
+      default:
+        break;
+    }
+  });
+  return [active, completed, deleted];
+};
+
 const filterReducer = (state, action) => {
   const { type, payload } = action;
 
   switch (type) {
     case "sortDate": {
       const isAsc = payload === FILTER_TYPES.NEWEST;
-      const sorted = getFiltered(state.showOnly, state.notes).sort((a, b) =>
-        timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
-      );
-      return { ...state, sortDeadline: "", sortDate: payload, filteredNotes: sorted };
+
+      return {
+        ...state,
+        sortDeadline: "",
+        sortDate: payload,
+        active: state.active.sort((a, b) =>
+          timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
+        ),
+        completed: state.completed.sort((a, b) =>
+          timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
+        ),
+        deleted: state.deleted.sort((a, b) =>
+          timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
+        ),
+      };
     }
     case "sortDeadline": {
       const isAsc = payload === FILTER_TYPES.CLOSEST;
-      const sorted = getFiltered(state.showOnly, state.notes).sort((a, b) =>
-        deadlineCompare(a, b, isAsc ? "asc" : "desc")
-      );
 
-      return { ...state, sortDate: "", sortDeadline: payload, filteredNotes: sorted };
+      return {
+        ...state,
+        sortDate: "",
+        sortDeadline: payload,
+        active: state.active.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc")),
+        completed: state.completed.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc")),
+        deleted: state.deleted.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc")),
+      };
     }
     case "showOnly": {
-      // const filtered = state.filteredNotes.filter((note) => note.status === payload);
-      const isAsc =
-        state.sortDate === FILTER_TYPES.NEWEST || state.sortDeadline === FILTER_TYPES.CLOSEST;
-      const isSortDate = state.sortDate !== "";
-      const filtered = getFiltered(payload, state.notes).sort((a, b) =>
-        isSortDate
-          ? timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
-          : deadlineCompare(a, b, isAsc ? "asc" : "desc")
-      );
-
-      return { ...state, showOnly: payload, filteredNotes: filtered };
+      return {
+        ...state,
+        showOnly: payload,
+      };
     }
     case "setNotes": {
       const isAsc =
         state.sortDate === FILTER_TYPES.NEWEST || state.sortDeadline === FILTER_TYPES.CLOSEST;
       const isSortDate = state.sortDate !== "";
 
-      const sorted = getFiltered(state.showOnly, payload).sort((a, b) =>
-        isSortDate
-          ? timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
-          : deadlineCompare(a, b, isAsc ? "asc" : "desc")
-      );
-      return { ...state, notes: payload, filteredNotes: sorted };
+      const [active, completed, deleted] = separateByStatus(payload);
+      if (isSortDate) {
+        active.sort((a, b) => timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc"));
+        completed.sort((a, b) =>
+          timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
+        );
+        deleted.sort((a, b) => timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc"));
+      } else {
+        active.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc"));
+        completed.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc"));
+        deleted.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc"));
+      }
+
+      return { ...state, notes: payload, active, completed, deleted };
     }
     default:
       throw new Error("Action type not recognised!");
@@ -101,12 +145,14 @@ const filterReducer = (state, action) => {
 
 const Notes = ({ theme }) => {
   const breakpoints = {
-    default: 3,
-    [theme.breakpoints.values.lg]: 2,
-    [theme.breakpoints.values.md]: 1,
+    xl: 3,
+    lg: 2,
+    md: 1,
   };
+
   const styles = {
     mainContainer: css`
+      position: relative;
       padding-bottom: 5rem;
 
       & .MuiFab-root {
@@ -114,6 +160,28 @@ const Notes = ({ theme }) => {
         right: 2rem;
         bottom: 1.8rem;
         z-index: ${theme.zIndex.speedDial};
+      }
+
+      .MuiMasonry-root {
+        align-content: start;
+        opacity: 0;
+        transition-property: opacity;
+        transition-duration: 300ms;
+      }
+
+      .MuiMasonry-root.masonry-entering {
+        opacity: 0;
+      }
+      .MuiMasonry-root.masonry-entered {
+        opacity: 1;
+        transition-duration: 200ms;
+      }
+      .MuiMasonry-root.masonry-exiting {
+        transition-duration: 200ms;
+        opacity: 0;
+      }
+      .MuiMasonry-root.masonry-exited {
+        opacity: 0;
       }
 
       ${theme.breakpoints.up("md")} {
@@ -139,9 +207,6 @@ const Notes = ({ theme }) => {
           padding-left: 30px;
         }
       }
-    `,
-    item: css`
-      margin-bottom: 20px;
     `,
     filterStack: css`
       align-items: center;
@@ -190,19 +255,21 @@ const Notes = ({ theme }) => {
   const notification = useSelector((state) => state.notification);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   const preferences = getPreferences(user.data._id);
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMedium = useMediaQuery(theme.breakpoints.down("md"));
 
   const [showFilters, setShowFilters] = useState(preferences.filterOpen || false);
   const [noteDialogID, setNoteDialogID] = useState(null);
   const [filterState, dispatchFilter] = useReducer(filterReducer, {
     ...getFilterState(preferences),
     notes: user.data.notes,
-    filteredNotes: [],
+    // filteredNotes: [],
+    active: [],
+    completed: [],
+    deleted: [],
   });
-
-  const isPortrait = useMediaQuery(theme.breakpoints.down("md"));
+  const [isExiting, setIsExiting] = useState(false);
 
   const handleFirstAction = (id, status) => {
     switch (status) {
@@ -244,6 +311,17 @@ const Notes = ({ theme }) => {
 
   const closeDialog = () => setNoteDialogID(null);
 
+  const handleFilterChange = (newData) => {
+    if (newData.type === "showOnly") {
+      setIsExiting(true);
+    }
+
+    dispatchFilter(newData);
+  };
+
+  // const handleExitStart = () => setIsExiting(true);
+  const handleExitEnd = () => setIsExiting(false);
+
   useEffect(() => {
     if (notification.success) {
       dispatch(clearNotification());
@@ -280,11 +358,13 @@ const Notes = ({ theme }) => {
   return (
     <Container sx={styles.mainContainer}>
       <Stack direction="row" sx={styles.filterStack}>
-        <Collapse in={showFilters && !isMobile} sx={styles.filtersWrapper}>
-          {!isMobile && (
+        <Collapse in={showFilters && !isSmall} sx={styles.filtersWrapper}>
+          {!isSmall && (
             <FiltersBar
+              // disabled={isExiting}
               values={filterState}
-              onChange={(data) => dispatchFilter(data)}
+              onChange={handleFilterChange}
+              // onChange={(data) => dispatchFilter(data)}
               spacing={{ md: 5 }}
               justifyContent="center"
               alignItems="center"
@@ -302,28 +382,78 @@ const Notes = ({ theme }) => {
           Filtrovať
         </EasyButtons.Text>
       </Stack>
-      <Masonry
-        breakpointCols={breakpoints}
-        css={styles.grid}
-        className="notes-grid"
-        columnClassName="notes-grid_column"
-      >
-        {filterState.filteredNotes.map((note) => (
-          <div key={note._id} css={styles.item}>
-            <NoteCard
-              {...note}
-              onFirstAction={handleFirstAction}
-              onSecondAction={handleSecondAction}
-            />
-          </div>
-        ))}
-      </Masonry>
 
-      {filterState.filteredNotes.length < 1 && (
+      <Transition
+        in={filterState.showOnly === FILTER_TYPES.ACTIVE && !isExiting}
+        timeout={animationDurations}
+        unmountOnExit
+        onExited={handleExitEnd}
+      >
+        {(state) => (
+          <Masonry columns={breakpoints} spacing={3} className={`masonry-${state}`}>
+            {filterState.active.map((note) => (
+              <div key={note._id} css={styles.item}>
+                <NoteCard
+                  {...note}
+                  presenceState={"none"}
+                  onFirstAction={handleFirstAction}
+                  onSecondAction={handleSecondAction}
+                />
+              </div>
+            ))}
+          </Masonry>
+        )}
+      </Transition>
+
+      <Transition
+        in={filterState.showOnly === FILTER_TYPES.COMPLETED && !isExiting}
+        timeout={animationDurations}
+        unmountOnExit
+        onExited={handleExitEnd}
+      >
+        {(state) => (
+          <Masonry columns={breakpoints} spacing={3} className={`masonry-${state}`}>
+            {filterState.completed.map((note) => (
+              <div key={note._id} css={styles.item}>
+                <NoteCard
+                  {...note}
+                  presenceState={"none"}
+                  onFirstAction={handleFirstAction}
+                  onSecondAction={handleSecondAction}
+                />
+              </div>
+            ))}
+          </Masonry>
+        )}
+      </Transition>
+
+      <Transition
+        in={filterState.showOnly === FILTER_TYPES.DELETED && !isExiting}
+        timeout={animationDurations}
+        unmountOnExit
+        onExited={handleExitEnd}
+      >
+        {(state) => (
+          <Masonry columns={breakpoints} spacing={3} className={`masonry-${state}`}>
+            {filterState.deleted.map((note) => (
+              <div key={note._id} css={styles.item}>
+                <NoteCard
+                  {...note}
+                  presenceState={"none"}
+                  onFirstAction={handleFirstAction}
+                  onSecondAction={handleSecondAction}
+                />
+              </div>
+            ))}
+          </Masonry>
+        )}
+      </Transition>
+
+      {filterState[filterState.showOnly].length < 1 && (
         <NotesPagePlaceholder statusFilter={filterState.showOnly} sx={styles.placeholder} />
       )}
 
-      <Zoom in={isPortrait}>
+      <Zoom in={isMedium}>
         <Fab color="primary" size="large" aria-label="add" onClick={handleAddNoteClick}>
           <PlaylistAdd />
         </Fab>
@@ -339,7 +469,7 @@ const Notes = ({ theme }) => {
       />
 
       <EasyDialog
-        isOpen={showFilters && isMobile && !user.showIntro}
+        isOpen={showFilters && isSmall && !user.showIntro}
         title="Nastaviť filtre"
         disableConfirm
         buttonNames={["Close"]}

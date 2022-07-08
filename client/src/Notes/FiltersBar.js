@@ -51,7 +51,7 @@ const styles = {
   `,
 };
 
-const FiltersBar = ({ values, onChange, ...rest }) => {
+const FiltersBar = ({ values, disabled, onChange, ...rest }) => {
   const renderOptions = (list) =>
     list.map((item) => (
       <MenuItem value={item.value} key={item.value}>
@@ -72,6 +72,7 @@ const FiltersBar = ({ values, onChange, ...rest }) => {
   return (
     <Stack direction={{ md: "row" }} {...rest}>
       <ButtonCycle
+        disabled={disabled}
         value={values.sortDate}
         offFocus={!values.sortDate}
         onChange={(newValue) => onChange({ type: "sortDate", payload: newValue })}
@@ -80,6 +81,7 @@ const FiltersBar = ({ values, onChange, ...rest }) => {
       </ButtonCycle>
 
       <ButtonCycle
+        disabled={disabled}
         value={values.sortDeadline}
         offFocus={!values.sortDeadline}
         onChange={(newValue) => onChange({ type: "sortDeadline", payload: newValue })}
@@ -90,6 +92,7 @@ const FiltersBar = ({ values, onChange, ...rest }) => {
       <FormControl sx={styles.selectControl} color="secondary">
         <InputLabel id="selectShowOnlyLabel">Show only</InputLabel>
         <Select
+          disabled={disabled}
           labelId="selectShowOnlyLabel"
           label="Show only"
           id="showOnly"
@@ -119,7 +122,7 @@ const ButtonItem = ({ children, icon, innerRef, ...rest }) => (
   </Stack>
 );
 
-const ButtonCycle = ({ children, value, offFocus, onChange }) => {
+const ButtonCycle = ({ children, value, offFocus, disabled, onChange }) => {
   const [childrenClone, setChildrenClone] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const childRefs = useRef([]);
@@ -163,6 +166,7 @@ const ButtonCycle = ({ children, value, offFocus, onChange }) => {
 
   const renderChild = () => (
     <EasyButtons.Text
+      disabled={disabled}
       color={value ? "secondary" : "neutral"}
       sx={styles.cycleButton}
       onClick={handleClick}
