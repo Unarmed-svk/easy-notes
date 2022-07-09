@@ -8,6 +8,7 @@ import {
 } from "@mui/icons-material";
 import {
   Avatar,
+  Box,
   Card,
   CardContent,
   CardHeader,
@@ -25,6 +26,7 @@ import { blue, green, orange, red } from "@mui/material/colors";
 import { differenceInCalendarDays, format, startOfToday } from "date-fns";
 import skLocale from "date-fns/locale/sk";
 import { dateToReadableString } from "../helpers/optimisations";
+import { ACTION_TYPES } from "../helpers/consts";
 
 const NoteCard = ({
   _id,
@@ -35,8 +37,7 @@ const NoteCard = ({
   status,
   createdAt,
   actionState,
-  presenceState,
-  timeout,
+  disabled,
   onFirstAction,
   onSecondAction,
 }) => {
@@ -91,7 +92,10 @@ const NoteCard = ({
         flex: 1 1 auto;
       }
 
-      & .NoteCard-overlay {
+      .Card-overlay {
+        display: flex;
+        align-items: end;
+        justify-content: center;
         content: " ";
         position: absolute;
         top: 0;
@@ -99,12 +103,40 @@ const NoteCard = ({
         right: 0;
         height: 100%;
         border-radius: inherit;
+        background-color: transparent;
         pointer-events: none;
         z-index: 500;
+        transition: background-color 300ms ${theme.transitions.easing.easeOut};
       }
 
-      &:not(.action-none) .NoteCard-overlay {
-        pointer-events: auto;
+      .Card-overlay .MuiBox-root {
+        transform: translate(0, 100%);
+        transition: transform 500ms ${theme.transitions.easing.easeOut};
+        pointer-events: none;
+      }
+
+      &.action-complete .Card-overlay{
+        background-color: ${green[500]};
+      }
+
+      &.action-delete .Card-overlay{
+        background-color: ${red[500]};
+      }
+
+      &.action-return .Card-overlay{
+        background-color: ${theme.palette.warning.main};
+      }
+
+      &.action-retrieve .Card-overlay{
+        background-color: ${green[500]};
+      }
+
+      &.action-discard .Card-overlay{
+        background-color: ${red[500]};
+      }
+
+      &:not(.action-none) .Card-overlay .MuiBox-root {
+        transform: translate(0, -10%);
       }
 
       &:not(.note-active) .MuiAvatar-root:after {
@@ -144,22 +176,6 @@ const NoteCard = ({
       }
     `,
   };
-
-  // &.note-entering {
-  //   opacity: 0;
-  //   transition-duration: ${timeout.cssEnter}ms;
-  // }
-  // &.note-entered {
-  //   opacity: 1;
-  //   transition-duration: ${timeout.cssEnter}ms;
-  // }
-  // &.note-exiting {
-  //   opacity: 0;
-  //   transition-duration: ${timeout.exit}ms;
-  // }
-  // &.note-exited {
-  //   opacity: 0;
-  // }
 
   const getCategoryName = (cat) => {
     switch (cat) {
@@ -228,6 +244,7 @@ const NoteCard = ({
   };
 
   const getTooltipText = (isFirst) => {
+    if (disabled) return "";
     if (isFirst) {
       switch (status) {
         case "active":
@@ -249,7 +266,7 @@ const NoteCard = ({
     }
   };
 
-  const renderActionIcon = (isFirst) => {
+  const renderButtonIcon = (isFirst) => {
     if (isFirst) {
       return status === "active" ? (
         <CheckRounded />
@@ -263,9 +280,26 @@ const NoteCard = ({
     }
   };
 
+  const renderAnimationIcon = () => {
+    switch (actionState) {
+      case ACTION_TYPES.COMPLETE:
+        return <CheckRounded />;
+      case ACTION_TYPES.DELETE:
+        return <DeleteOutlined />;
+      case ACTION_TYPES.RETURN:
+        return <Undo />;
+      case ACTION_TYPES.RETRIEVE:
+        return <Restore />;
+      case ACTION_TYPES.DISCARD:
+        return <DeleteForeverOutlined />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div css={styles.cardContainer} className="NoteCard-container">
-      <Card sx={styles.card} className={`note-${status || ""} note-${presenceState}`}>
+      <Card sx={styles.card} className={`note-${status || ""} action-${actionState || "none"}`}>
         <CardHeader
           avatar={<Avatar sx={styles.avatar}>{getCategoryName(category)[0]}</Avatar>}
           title={title}
@@ -288,9 +322,10 @@ const NoteCard = ({
               <IconButton
                 color={status === "completed" ? "warning" : "success"}
                 aria-label="delete"
+                disabled={disabled}
                 onClick={() => onFirstAction(_id, status)}
               >
-                {renderActionIcon(true)}
+                {renderButtonIcon(true)}
               </IconButton>
             </EasyTooltip>
             {status !== "completed" && (
@@ -298,20 +333,30 @@ const NoteCard = ({
                 <IconButton
                   color="error"
                   aria-label="delete"
+                  disabled={disabled}
                   onClick={() => onSecondAction(_id, status)}
                 >
-                  {renderActionIcon(false)}
+                  {renderButtonIcon(false)}
                 </IconButton>
               </EasyTooltip>
             )}
           </Stack>
         </CardContent>
-        {/* <motion.div
-          className="NoteCard-overlay"
-          variants={overlayVariants}
-          initial={false}
-          transition={{ ease: "easeOut" }}
-        /> */}
+        <div className="Card-overlay">
+          <Box
+            sx={{
+              padding: 2,
+              borderRadius: 999,
+              backgroundColor: "action.selected",
+              color: "white",
+              ".MuiSvgIcon-root": {
+                fontSize: 64,
+              },
+            }}
+          >
+            {renderAnimationIcon()}
+          </Box>
+        </div>
       </Card>
     </div>
   );

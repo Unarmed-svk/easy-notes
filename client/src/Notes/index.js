@@ -6,7 +6,7 @@ import NoteCard from "./NoteCard";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteNote, patchNoteStatus, retrieveNote } from "../store/actions/note.actions";
 import { clearNotification, setShowIntro } from "../store/actions";
-import { FILTER_TYPES } from "../helpers/consts";
+import { ACTION_TYPES, FILTER_TYPES } from "../helpers/consts";
 import FiltersBar from "./FiltersBar";
 import { FilterAlt, PlaylistAdd } from "@mui/icons-material";
 import EasyButtons from "../Common/EasyButtons";
@@ -22,11 +22,6 @@ const DEFAULT_FILTER_STATE = {
   sortDate: FILTER_TYPES.NEWEST,
   sortDeadline: "",
   showOnly: FILTER_TYPES.ACTIVE,
-};
-
-const animationDurations = {
-  enter: 0,
-  exit: 200,
 };
 
 const getFilterState = (preferences) => {
@@ -89,16 +84,24 @@ const filterReducer = (state, action) => {
         ...state,
         sortDeadline: "",
         sortDate: payload,
-        active: state.active.sort((a, b) =>
-          timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
-        ),
-        completed: state.completed.sort((a, b) =>
-          timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
-        ),
-        deleted: state.deleted.sort((a, b) =>
+        filteredNotes: state.filteredNotes.sort((a, b) =>
           timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
         ),
       };
+      // return {
+      //   ...state,
+      //   sortDeadline: "",
+      //   sortDate: payload,
+      //   active: state.active.sort((a, b) =>
+      //     timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
+      //   ),
+      //   completed: state.completed.sort((a, b) =>
+      //     timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
+      //   ),
+      //   deleted: state.deleted.sort((a, b) =>
+      //     timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
+      //   ),
+      // };
     }
     case "sortDeadline": {
       const isAsc = payload === FILTER_TYPES.CLOSEST;
@@ -107,15 +110,34 @@ const filterReducer = (state, action) => {
         ...state,
         sortDate: "",
         sortDeadline: payload,
-        active: state.active.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc")),
-        completed: state.completed.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc")),
-        deleted: state.deleted.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc")),
+        filteredNotes: state.filteredNotes.sort((a, b) =>
+          deadlineCompare(a, b, isAsc ? "asc" : "desc")
+        ),
       };
+      // return {
+      //   ...state,
+      //   sortDate: "",
+      //   sortDeadline: payload,
+      //   active: state.active.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc")),
+      //   completed: state.completed.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc")),
+      //   deleted: state.deleted.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc")),
+      // };
     }
     case "showOnly": {
+      const isAsc =
+        state.sortDate === FILTER_TYPES.NEWEST || state.sortDeadline === FILTER_TYPES.CLOSEST;
+      const isSortDate = state.sortDate !== "";
+
+      const newFiltered = getFiltered(payload, state.notes).sort((a, b) =>
+        isSortDate
+          ? timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
+          : deadlineCompare(a, b, isAsc ? "asc" : "desc")
+      );
+
       return {
         ...state,
         showOnly: payload,
+        filteredNotes: newFiltered.filter((note) => note.action === undefined),
       };
     }
     case "setNotes": {
@@ -123,31 +145,51 @@ const filterReducer = (state, action) => {
         state.sortDate === FILTER_TYPES.NEWEST || state.sortDeadline === FILTER_TYPES.CLOSEST;
       const isSortDate = state.sortDate !== "";
 
-      const [active, completed, deleted] = separateByStatus(payload);
-      if (isSortDate) {
-        active.sort((a, b) => timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc"));
-        completed.sort((a, b) =>
-          timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
-        );
-        deleted.sort((a, b) => timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc"));
-      } else {
-        active.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc"));
-        completed.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc"));
-        deleted.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc"));
-      }
+      const newFiltered = getFiltered(state.showOnly, payload).sort((a, b) =>
+        isSortDate
+          ? timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
+          : deadlineCompare(a, b, isAsc ? "asc" : "desc")
+      );
 
-      return { ...state, notes: payload, active, completed, deleted };
+      return { ...state, notes: payload, filteredNotes: newFiltered };
+
+      // const [active, completed, deleted] = separateByStatus(payload);
+      // if (isSortDate) {
+      //   active.sort((a, b) => timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc"));
+      //   completed.sort((a, b) =>
+      //     timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
+      //   );
+      //   deleted.sort((a, b) => timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc"));
+      // } else {
+      //   active.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc"));
+      //   completed.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc"));
+      //   deleted.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc"));
+      // }
+
+      // return { ...state, notes: payload, active, completed, deleted };
+    }
+    case "clearActions": {
+      return {
+        ...state,
+        filteredNotes: state.filteredNotes.filter((note) => note.action === undefined),
+      };
     }
     default:
       throw new Error("Action type not recognised!");
   }
 };
 
+const masonryTimeout = {
+  cssEnter: 150,
+  enter: 150,
+  exit: 200,
+};
+
 const Notes = ({ theme }) => {
   const breakpoints = {
-    xl: 3,
-    lg: 2,
-    md: 1,
+    lg: 3,
+    md: 2,
+    sm: 1,
   };
 
   const styles = {
@@ -166,18 +208,18 @@ const Notes = ({ theme }) => {
         align-content: start;
         opacity: 0;
         transition-property: opacity;
-        transition-duration: 300ms;
+        transition-duration: 200ms;
       }
 
       .MuiMasonry-root.masonry-entering {
-        opacity: 0;
+        opacity: 1;
+        transition-duration: ${masonryTimeout.cssEnter}ms;
       }
       .MuiMasonry-root.masonry-entered {
         opacity: 1;
-        transition-duration: 200ms;
       }
       .MuiMasonry-root.masonry-exiting {
-        transition-duration: 200ms;
+        transition-duration: ${masonryTimeout.exit}ms;
         opacity: 0;
       }
       .MuiMasonry-root.masonry-exited {
@@ -193,19 +235,21 @@ const Notes = ({ theme }) => {
         }
       }
     `,
-    grid: css`
-      display: flex;
-      width: auto;
+    item: css`
+      opacity: 0;
+      transition: opacity 200ms ease-out 500ms;
 
-      & .notes-grid_column {
-        background-clip: padding-box;
+      &.item-entering {
+        opacity: 1;
       }
-
-      ${theme.breakpoints.up("md")} {
-        margin-left: -30px;
-        & .notes-grid_column {
-          padding-left: 30px;
-        }
+      &.item-entered {
+        opacity: 1;
+      }
+      &.item-exiting {
+        opacity: 0;
+      }
+      &.item-exited {
+        opacity: 0;
       }
     `,
     filterStack: css`
@@ -264,38 +308,49 @@ const Notes = ({ theme }) => {
   const [filterState, dispatchFilter] = useReducer(filterReducer, {
     ...getFilterState(preferences),
     notes: user.data.notes,
-    // filteredNotes: [],
-    active: [],
-    completed: [],
-    deleted: [],
+    filteredNotes: [],
+    // active: [],
+    // completed: [],
+    // deleted: [],
   });
+  const [changedNotes, setChangedNotes] = useState([]);
+  const [nextFilterDispatch, setNextFilterDispatch] = useState({});
   const [isExiting, setIsExiting] = useState(false);
 
-  const handleFirstAction = (id, status) => {
-    switch (status) {
+  const handleFirstAction = (note) => {
+    switch (note.status) {
       case "active":
-        dispatch(patchNoteStatus(id, "completed"));
+        setChangedNotes((changedNotes) => [
+          ...changedNotes,
+          { ...note, action: ACTION_TYPES.COMPLETE },
+        ]);
+        dispatch(patchNoteStatus(note._id, "completed"));
         break;
       case "completed":
-        dispatch(patchNoteStatus(id, "active"));
+        setChangedNotes((changedNotes) => [
+          ...changedNotes,
+          { ...note, action: ACTION_TYPES.RETURN },
+        ]);
+        dispatch(patchNoteStatus(note._id, "active"));
+
         break;
       case "deleted":
-        dispatch(retrieveNote(id));
+        dispatch(retrieveNote(note._id));
         break;
       default:
         throw new Error("Note status unrecognised");
     }
   };
-  const handleSecondAction = (id, status) => {
-    switch (status) {
+  const handleSecondAction = (note) => {
+    switch (note.status) {
       case "active":
-        dispatch(patchNoteStatus(id, "deleted"));
+        dispatch(patchNoteStatus(note._id, "deleted"));
         break;
       case "completed":
-        alert(`Note ${id} second action fired!`);
+        alert(`Note ${note._id} second action fired!`);
         break;
       case "deleted":
-        setNoteDialogID(id);
+        setNoteDialogID(note._id);
         break;
       default:
         throw new Error("Note status unrecognised");
@@ -314,20 +369,48 @@ const Notes = ({ theme }) => {
   const handleFilterChange = (newData) => {
     if (newData.type === "showOnly") {
       setIsExiting(true);
+      setNextFilterDispatch(newData);
+      return;
     }
 
     dispatchFilter(newData);
   };
 
-  // const handleExitStart = () => setIsExiting(true);
-  const handleExitEnd = () => setIsExiting(false);
+  const handleExitEnd = () => {
+    setIsExiting(false);
+    dispatchFilter(nextFilterDispatch);
+  };
+
+  // const renderMasonry = (filterType) => (
+  //   <Transition
+  //     in={!isExiting && filterState.showOnly === filterType}
+  //     timeout={masonryTimeout}
+  //     onExited={handleExitEnd}
+  //   >
+  //     {(state) => (
+  //       <Masonry columns={breakpoints} spacing={3} className={`masonry-${state}`}>
+  //         {filterState[filterType].map((note) => (
+  //           <div key={note._id} css={styles.item}>
+  //             <NoteCard
+  //               {...note}
+  //               actionState={actionStates[note._id]}
+  //               disabled={actionStates[note._id] !== undefined}
+  //               onFirstAction={handleFirstAction}
+  //               onSecondAction={handleSecondAction}
+  //             />
+  //           </div>
+  //         ))}
+  //       </Masonry>
+  //     )}
+  //   </Transition>
+  // );
 
   useEffect(() => {
     if (notification.success) {
       dispatch(clearNotification());
     } else if (notification.error) {
       dispatch(clearNotification());
-      console.error(`OUCH: ${notification.message}`);
+      console.error(notification.message);
     }
     return () => {
       if (notification.error || notification.success) dispatch(clearNotification());
@@ -337,12 +420,16 @@ const Notes = ({ theme }) => {
   useEffect(() => {
     dispatchFilter({
       type: "setNotes",
-      payload: user.data.notes.map((note) => ({
-        ...note,
-        timestamp: parseISO(note.createdAt).getTime(),
-        dlTimestamp: parseISO(note.deadline).getTime(),
-      })),
+      payload: [
+        ...user.data.notes.map((note) => ({
+          ...note,
+          timestamp: parseISO(note.createdAt).getTime(),
+          dlTimestamp: parseISO(note.deadline).getTime(),
+        })),
+        ...changedNotes,
+      ],
     });
+    setChangedNotes([]);
   }, [user.data.notes]);
 
   useEffect(() => {
@@ -361,10 +448,9 @@ const Notes = ({ theme }) => {
         <Collapse in={showFilters && !isSmall} sx={styles.filtersWrapper}>
           {!isSmall && (
             <FiltersBar
-              // disabled={isExiting}
+              disabled={isExiting}
               values={filterState}
               onChange={handleFilterChange}
-              // onChange={(data) => dispatchFilter(data)}
               spacing={{ md: 5 }}
               justifyContent="center"
               alignItems="center"
@@ -383,73 +469,37 @@ const Notes = ({ theme }) => {
         </EasyButtons.Text>
       </Stack>
 
-      <Transition
-        in={filterState.showOnly === FILTER_TYPES.ACTIVE && !isExiting}
-        timeout={animationDurations}
-        unmountOnExit
-        onExited={handleExitEnd}
-      >
+      {/* {renderMasonry(FILTER_TYPES.ACTIVE)}
+      {renderMasonry(FILTER_TYPES.COMPLETED)}
+      {renderMasonry(FILTER_TYPES.DELETED)} */}
+
+      <Transition in={!isExiting} timeout={masonryTimeout} onExited={handleExitEnd}>
         {(state) => (
           <Masonry columns={breakpoints} spacing={3} className={`masonry-${state}`}>
-            {filterState.active.map((note) => (
-              <div key={note._id} css={styles.item}>
-                <NoteCard
-                  {...note}
-                  presenceState={"none"}
-                  onFirstAction={handleFirstAction}
-                  onSecondAction={handleSecondAction}
-                />
-              </div>
+            {filterState.filteredNotes.map((note) => (
+              <Transition
+                in={note.action === undefined}
+                timeout={{ enter: 0, exit: 1000 }}
+                unmountOnExit
+              >
+                {(itemState) => (
+                  <div key={note._id} css={styles.item} className={`item-${itemState}`}>
+                    <NoteCard
+                      {...note}
+                      actionState={note.action}
+                      disabled={note.action !== undefined}
+                      onFirstAction={() => handleFirstAction(note)}
+                      onSecondAction={() => handleSecondAction(note)}
+                    />
+                  </div>
+                )}
+              </Transition>
             ))}
           </Masonry>
         )}
       </Transition>
 
-      <Transition
-        in={filterState.showOnly === FILTER_TYPES.COMPLETED && !isExiting}
-        timeout={animationDurations}
-        unmountOnExit
-        onExited={handleExitEnd}
-      >
-        {(state) => (
-          <Masonry columns={breakpoints} spacing={3} className={`masonry-${state}`}>
-            {filterState.completed.map((note) => (
-              <div key={note._id} css={styles.item}>
-                <NoteCard
-                  {...note}
-                  presenceState={"none"}
-                  onFirstAction={handleFirstAction}
-                  onSecondAction={handleSecondAction}
-                />
-              </div>
-            ))}
-          </Masonry>
-        )}
-      </Transition>
-
-      <Transition
-        in={filterState.showOnly === FILTER_TYPES.DELETED && !isExiting}
-        timeout={animationDurations}
-        unmountOnExit
-        onExited={handleExitEnd}
-      >
-        {(state) => (
-          <Masonry columns={breakpoints} spacing={3} className={`masonry-${state}`}>
-            {filterState.deleted.map((note) => (
-              <div key={note._id} css={styles.item}>
-                <NoteCard
-                  {...note}
-                  presenceState={"none"}
-                  onFirstAction={handleFirstAction}
-                  onSecondAction={handleSecondAction}
-                />
-              </div>
-            ))}
-          </Masonry>
-        )}
-      </Transition>
-
-      {filterState[filterState.showOnly].length < 1 && (
+      {filterState.filteredNotes.length < 1 && (
         <NotesPagePlaceholder statusFilter={filterState.showOnly} sx={styles.placeholder} />
       )}
 
@@ -479,7 +529,7 @@ const Notes = ({ theme }) => {
         content={
           <FiltersBar
             values={filterState}
-            onChange={(data) => dispatchFilter(data)}
+            onChange={handleFilterChange}
             direction="row"
             flexWrap="wrap"
             spacing="4"
