@@ -317,24 +317,23 @@ const Notes = ({ theme }) => {
   const [nextFilterDispatch, setNextFilterDispatch] = useState({});
   const [isExiting, setIsExiting] = useState(false);
 
+  const addNoteChange = (note, action) => {
+    setChangedNotes((changedNotes) => [...changedNotes, { ...note, action }]);
+  };
+
   const handleFirstAction = (note) => {
     switch (note.status) {
       case "active":
-        setChangedNotes((changedNotes) => [
-          ...changedNotes,
-          { ...note, action: ACTION_TYPES.COMPLETE },
-        ]);
+        addNoteChange(note, ACTION_TYPES.COMPLETE);
         dispatch(patchNoteStatus(note._id, "completed"));
         break;
       case "completed":
-        setChangedNotes((changedNotes) => [
-          ...changedNotes,
-          { ...note, action: ACTION_TYPES.RETURN },
-        ]);
+        addNoteChange(note, ACTION_TYPES.RETURN);
         dispatch(patchNoteStatus(note._id, "active"));
 
         break;
       case "deleted":
+        addNoteChange(note, ACTION_TYPES.RETRIEVE);
         dispatch(retrieveNote(note._id));
         break;
       default:
@@ -344,6 +343,7 @@ const Notes = ({ theme }) => {
   const handleSecondAction = (note) => {
     switch (note.status) {
       case "active":
+        addNoteChange(note, ACTION_TYPES.DELETE);
         dispatch(patchNoteStatus(note._id, "deleted"));
         break;
       case "completed":
