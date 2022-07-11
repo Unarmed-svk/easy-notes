@@ -8,17 +8,17 @@ import EasyButtons from "../Common/EasyButtons";
 
 const filterOptions = {
   sortDate: [
-    { name: "Date", value: FILTER_TYPES.NEWEST },
-    { name: "Date", value: FILTER_TYPES.OLDEST },
+    { name: "Dátum", value: FILTER_TYPES.NEWEST },
+    { name: "Dátum", value: FILTER_TYPES.OLDEST },
   ],
   sortDeadline: [
-    { name: "Deadline", value: FILTER_TYPES.CLOSEST },
-    { name: "Deadline", value: FILTER_TYPES.FARTHEST },
+    { name: "Termín", value: FILTER_TYPES.CLOSEST },
+    { name: "Termín", value: FILTER_TYPES.FARTHEST },
   ],
   showOnly: [
-    { name: "Active", value: FILTER_TYPES.ACTIVE },
-    { name: "Completed", value: FILTER_TYPES.COMPLETED },
-    { name: "Deleted", value: FILTER_TYPES.DELETED },
+    { name: "Aktívne", value: FILTER_TYPES.ACTIVE },
+    { name: "Splnené", value: FILTER_TYPES.COMPLETED },
+    { name: "Zmazané", value: FILTER_TYPES.DELETED },
   ],
 };
 
@@ -90,11 +90,11 @@ const FiltersBar = ({ values, disabled, onChange, ...rest }) => {
       </ButtonCycle>
 
       <FormControl sx={styles.selectControl} color="secondary">
-        <InputLabel id="selectShowOnlyLabel">Show only</InputLabel>
+        <InputLabel id="selectShowOnlyLabel">Zobraziť iba</InputLabel>
         <Select
           disabled={disabled}
           labelId="selectShowOnlyLabel"
-          label="Show only"
+          label="Zobraziť iba"
           id="showOnly"
           name="showOnly"
           variant="standard"

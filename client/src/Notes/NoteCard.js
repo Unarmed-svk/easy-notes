@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { css } from "@emotion/react";
 import { useTheme } from "@mui/system";
 import { blue, green, orange, red } from "@mui/material/colors";
@@ -82,6 +82,13 @@ const NoteCard = ({
 
       .MuiCardContent-root .NoteCard-statuses .MuiChip-root {
         min-width: 5ch;
+      }
+
+      .MuiCardContent-root .NoteCard-statuses .Note-deadline .MuiChip-label {
+        display: none;
+      }
+      .MuiCardContent-root .NoteCard-statuses .Note-deadline .MuiChip-icon {
+        margin: 0;
       }
 
       .MuiCardContent-root .NoteCard-statuses .MuiIconButton-root {
@@ -166,6 +173,16 @@ const NoteCard = ({
       &:not(.note-active) .MuiCardContent-root {
         color: ${theme.palette.text.disabled};
       }
+
+      ${theme.breakpoints.up("sm")} {
+        .MuiCardContent-root .NoteCard-statuses .Note-deadline .MuiChip-label {
+          display: initial;
+        }
+        .MuiCardContent-root .NoteCard-statuses .Note-deadline .MuiChip-icon {
+          margin-left: 4px;
+          margin-right: -4px;
+        }
+      }
     `,
     avatar: css`
       text-transform: uppercase;
@@ -218,13 +235,14 @@ const NoteCard = ({
   );
 
   const renderNoteStatus = () => {
-    const statusIcon = status === "completed" ? <CheckRounded /> : <DeleteOutlined />;
+    const isCompleted = status === "completed";
     return (
       <Chip
         color={status === "completed" ? "success" : "error"}
-        icon={statusIcon}
-        label={status}
+        icon={isCompleted ? <CheckRounded /> : <DeleteOutlined />}
+        label={isCompleted ? "Splnená" : "Zmazaná"}
         size="small"
+        className="Note-status"
         sx={{ textTransform: "capitalize" }}
       />
     );
@@ -256,7 +274,15 @@ const NoteCard = ({
     }
     if (status !== "active") bgColor = "neutral";
 
-    return <Chip color={bgColor} size="small" icon={<TimerOutlined />} label={dateString} />;
+    return (
+      <Chip
+        color={bgColor}
+        size="small"
+        className="Note-deadline"
+        icon={<TimerOutlined />}
+        label={dateString}
+      />
+    );
   };
 
   const getTooltipText = (isFirst) => {
@@ -264,20 +290,20 @@ const NoteCard = ({
     if (isFirst) {
       switch (status) {
         case "active":
-          return "Mark as completed";
+          return "Presunúť medzi splnené";
         case "completed":
-          return "Mark as active";
+          return "Presunúť medzi aktívne";
         case "deleted":
-          return "Restore note";
+          return "Vytiahnuť z koša";
       }
     } else {
       switch (status) {
         case "active":
-          return "Delete note";
+          return "Presunúť do koša";
         case "completed":
           return "";
         case "deleted":
-          return "Delete permanently";
+          return "Odstrániť navždy";
       }
     }
   };

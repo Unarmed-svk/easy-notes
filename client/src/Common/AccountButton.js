@@ -19,8 +19,8 @@ import { useNavigate } from "react-router-dom";
 import EasyButtons from "./EasyButtons";
 
 const menuItems = [
-  { name: "Profile", linkTo: "/profile", icon: <AccountCircle fontSize="small" /> },
-  { name: "Log out", linkTo: "/signout", icon: <Logout fontSize="small" /> },
+  { name: "Profil", linkTo: "/profile", icon: <AccountCircle fontSize="small" /> },
+  { name: "Odhlásiť sa", linkTo: "/signout", icon: <Logout fontSize="small" /> },
 ];
 
 const stringToColor = (string) => {

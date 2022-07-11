@@ -88,20 +88,6 @@ const filterReducer = (state, action) => {
           timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
         ),
       };
-      // return {
-      //   ...state,
-      //   sortDeadline: "",
-      //   sortDate: payload,
-      //   active: state.active.sort((a, b) =>
-      //     timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
-      //   ),
-      //   completed: state.completed.sort((a, b) =>
-      //     timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
-      //   ),
-      //   deleted: state.deleted.sort((a, b) =>
-      //     timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
-      //   ),
-      // };
     }
     case "sortDeadline": {
       const isAsc = payload === FILTER_TYPES.CLOSEST;
@@ -114,14 +100,6 @@ const filterReducer = (state, action) => {
           deadlineCompare(a, b, isAsc ? "asc" : "desc")
         ),
       };
-      // return {
-      //   ...state,
-      //   sortDate: "",
-      //   sortDeadline: payload,
-      //   active: state.active.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc")),
-      //   completed: state.completed.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc")),
-      //   deleted: state.deleted.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc")),
-      // };
     }
     case "showOnly": {
       const isAsc =
@@ -152,21 +130,6 @@ const filterReducer = (state, action) => {
       );
 
       return { ...state, notes: payload, filteredNotes: newFiltered };
-
-      // const [active, completed, deleted] = separateByStatus(payload);
-      // if (isSortDate) {
-      //   active.sort((a, b) => timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc"));
-      //   completed.sort((a, b) =>
-      //     timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc")
-      //   );
-      //   deleted.sort((a, b) => timestampCompare(a.timestamp, b.timestamp, isAsc ? "asc" : "desc"));
-      // } else {
-      //   active.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc"));
-      //   completed.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc"));
-      //   deleted.sort((a, b) => deadlineCompare(a, b, isAsc ? "asc" : "desc"));
-      // }
-
-      // return { ...state, notes: payload, active, completed, deleted };
     }
     case "clearActions": {
       return {
@@ -190,6 +153,11 @@ const Notes = ({ theme }) => {
     lg: 3,
     md: 2,
     sm: 1,
+    xs: 1,
+  };
+  const spacing = {
+    sm: 3,
+    xs: 2,
   };
 
   const styles = {
@@ -309,9 +277,6 @@ const Notes = ({ theme }) => {
     ...getFilterState(preferences),
     notes: user.data.notes,
     filteredNotes: [],
-    // active: [],
-    // completed: [],
-    // deleted: [],
   });
   const [changedNotes, setChangedNotes] = useState([]);
   const [nextFilterDispatch, setNextFilterDispatch] = useState({});
@@ -381,30 +346,6 @@ const Notes = ({ theme }) => {
     dispatchFilter(nextFilterDispatch);
   };
 
-  // const renderMasonry = (filterType) => (
-  //   <Transition
-  //     in={!isExiting && filterState.showOnly === filterType}
-  //     timeout={masonryTimeout}
-  //     onExited={handleExitEnd}
-  //   >
-  //     {(state) => (
-  //       <Masonry columns={breakpoints} spacing={3} className={`masonry-${state}`}>
-  //         {filterState[filterType].map((note) => (
-  //           <div key={note._id} css={styles.item}>
-  //             <NoteCard
-  //               {...note}
-  //               actionState={actionStates[note._id]}
-  //               disabled={actionStates[note._id] !== undefined}
-  //               onFirstAction={handleFirstAction}
-  //               onSecondAction={handleSecondAction}
-  //             />
-  //           </div>
-  //         ))}
-  //       </Masonry>
-  //     )}
-  //   </Transition>
-  // );
-
   useEffect(() => {
     if (notification.success) {
       dispatch(clearNotification());
@@ -469,13 +410,9 @@ const Notes = ({ theme }) => {
         </EasyButtons.Text>
       </Stack>
 
-      {/* {renderMasonry(FILTER_TYPES.ACTIVE)}
-      {renderMasonry(FILTER_TYPES.COMPLETED)}
-      {renderMasonry(FILTER_TYPES.DELETED)} */}
-
       <Transition in={!isExiting} timeout={masonryTimeout} onExited={handleExitEnd}>
         {(state) => (
-          <Masonry columns={breakpoints} spacing={3} className={`masonry-${state}`}>
+          <Masonry columns={breakpoints} spacing={spacing} className={`masonry-${state}`}>
             {filterState.filteredNotes.map((note) => (
               <Transition
                 key={note._id}
@@ -513,9 +450,9 @@ const Notes = ({ theme }) => {
         isOpen={noteDialogID !== null && !user.showIntro}
         onClose={closeDialog}
         onConfirm={handleDeleteConfirm}
-        title="Delete the note permanently?"
-        description="This action cannot be reverted."
-        buttonNames={["Cancel", "Delete"]}
+        title="Odstrániť poznámku navždy?"
+        description="Tento krok sa už nedá vrátiť späť."
+        buttonNames={["Zrušiť", "Odstrániť"]}
         buttonColors={["secondary", "error"]}
       />
 

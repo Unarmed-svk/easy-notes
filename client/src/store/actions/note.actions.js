@@ -38,17 +38,17 @@ export const patchNoteStatus = (id, status) => {
       dispatch(actions.updateNotes(response.data));
       switch (status) {
         case "active":
-          dispatch(actions.successGlobal("Note marked as active", true));
+          dispatch(actions.successGlobal("Note marked as active", false));
           break;
         case "completed":
-          dispatch(actions.successGlobal("Note marked as completed", true));
+          dispatch(actions.successGlobal("Note marked as completed", false));
           break;
         case "deleted":
-          dispatch(actions.successGlobal("Note marked as deleted", true));
+          dispatch(actions.successGlobal("Note marked as deleted", false));
           break;
       }
     } catch (err) {
-      dispatch(actions.errorGlobal(err.response.data.message, false));
+      dispatch(actions.errorGlobal(err.response.data.message, true));
     }
   };
 };
@@ -62,9 +62,9 @@ export const retrieveNote = (id) => {
         getAuthHeader()
       );
       dispatch(actions.updateNotes(response.data));
-      dispatch(actions.successGlobal("Note successfuly retrieved", true));
+      dispatch(actions.successGlobal("Note successfuly retrieved", false));
     } catch (err) {
-      dispatch(actions.errorGlobal(err.response.data.message, false));
+      dispatch(actions.errorGlobal(err.response.data.message, true));
     }
   };
 };

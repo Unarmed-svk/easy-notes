@@ -25,7 +25,7 @@ const SignOut = ({}) => {
   return (
     <Box sx={{ display: "flex", height: "65%", justifyContent: "center", alignItems: "center" }}>
       <Typography variant="h3" component="h4" sx={{ fontWeight: "bold" }}>
-        Good bye!
+        Dovidenia!
       </Typography>
     </Box>
   );

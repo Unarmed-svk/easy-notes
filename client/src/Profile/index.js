@@ -54,9 +54,6 @@ const Profile = ({ theme }) => {
 
       ${theme.breakpoints.up("xl")} {
         padding-bottom: 10rem;
-        & .FormsContainer {
-          margin-left: 4rem;
-        }
         & .ButtonsContainer {
           padding-bottom: 8rem;
         }
@@ -76,6 +73,10 @@ const Profile = ({ theme }) => {
     `,
     accordion: css`
       border-bottom: none;
+
+      .MuiAccordionSummary-root .Mui-expanded {
+        color: ${theme.palette.secondary.dark};
+      }
 
       & .MuiAccordionDetails-root {
         padding: 1.25rem 4rem 2rem 4rem;
