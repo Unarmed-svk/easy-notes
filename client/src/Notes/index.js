@@ -478,6 +478,7 @@ const Notes = ({ theme }) => {
           <Masonry columns={breakpoints} spacing={3} className={`masonry-${state}`}>
             {filterState.filteredNotes.map((note) => (
               <Transition
+                key={note._id}
                 in={note.action === undefined}
                 timeout={{ enter: 0, exit: 1000 }}
                 unmountOnExit

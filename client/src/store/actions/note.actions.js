@@ -48,7 +48,7 @@ export const patchNoteStatus = (id, status) => {
           break;
       }
     } catch (err) {
-      dispatch(actions.errorGlobal(err.response.data.message, true));
+      dispatch(actions.errorGlobal(err.response.data.message, false));
     }
   };
 };
@@ -64,7 +64,7 @@ export const retrieveNote = (id) => {
       dispatch(actions.updateNotes(response.data));
       dispatch(actions.successGlobal("Note successfuly retrieved", true));
     } catch (err) {
-      dispatch(actions.errorGlobal(err.response.data.message, true));
+      dispatch(actions.errorGlobal(err.response.data.message, false));
     }
   };
 };

@@ -19,13 +19,13 @@ import {
 } from "@mui/material";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { css } from "@emotion/react";
 import { useTheme } from "@mui/system";
 import { blue, green, orange, red } from "@mui/material/colors";
 import { differenceInCalendarDays, format, startOfToday } from "date-fns";
 import skLocale from "date-fns/locale/sk";
-import { dateToReadableString } from "../helpers/optimisations";
+import { dateToReadableString, debounce } from "../helpers/optimisations";
 import { ACTION_TYPES } from "../helpers/consts";
 
 const NoteCard = ({
@@ -94,7 +94,7 @@ const NoteCard = ({
 
       .Card-overlay {
         display: flex;
-        align-items: end;
+        align-items: center;
         justify-content: center;
         content: " ";
         position: absolute;
@@ -110,9 +110,22 @@ const NoteCard = ({
       }
 
       .Card-overlay .MuiBox-root {
-        transform: translate(0, 100%);
+        width: 80px;
+        height: 80px;
+        padding: 1.5rem;
+        border-radius: 999px;
+        color: white;
+        text-align: center;
+        transform: translate(0, 180%);
         transition: transform 500ms ${theme.transitions.easing.easeOut};
         pointer-events: none;
+      }
+      .Card-overlay .MuiBox-root .MuiSvgIcon-root {
+        width: 100%;
+        height: 100%;
+        font-size: 64px;
+        line-height: 80px;
+        vertical-align: middle;
       }
 
       &.action-complete .Card-overlay{
@@ -136,7 +149,7 @@ const NoteCard = ({
       }
 
       &:not(.action-none) .Card-overlay .MuiBox-root {
-        transform: translate(0, -10%);
+        transform: translate(0, 0%);
       }
 
       &:not(.note-active) .MuiAvatar-root:after {
@@ -176,6 +189,9 @@ const NoteCard = ({
       }
     `,
   };
+
+  const debounceFirstAction = useCallback(debounce(onFirstAction, 500), [debounce]);
+  const debounceSecondAction = useCallback(debounce(onSecondAction, 500), [debounce]);
 
   const getCategoryName = (cat) => {
     switch (cat) {
@@ -323,7 +339,7 @@ const NoteCard = ({
                 color={status === "completed" ? "warning" : "success"}
                 aria-label="delete"
                 disabled={disabled}
-                onClick={() => onFirstAction(_id, status)}
+                onClick={() => debounceFirstAction(_id, status)}
               >
                 {renderButtonIcon(true)}
               </IconButton>
@@ -334,7 +350,7 @@ const NoteCard = ({
                   color="error"
                   aria-label="delete"
                   disabled={disabled}
-                  onClick={() => onSecondAction(_id, status)}
+                  onClick={() => debounceSecondAction(_id, status)}
                 >
                   {renderButtonIcon(false)}
                 </IconButton>
@@ -345,13 +361,7 @@ const NoteCard = ({
         <div className="Card-overlay">
           <Box
             sx={{
-              padding: 2,
-              borderRadius: 999,
               backgroundColor: "action.selected",
-              color: "white",
-              ".MuiSvgIcon-root": {
-                fontSize: 64,
-              },
             }}
           >
             {renderAnimationIcon()}
