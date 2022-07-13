@@ -3,6 +3,7 @@ export const SIGN_OUT = "sign-out";
 export const PATCH_PROFILE = "patch-profile";
 export const PATCH_PASSWORD = "patch-password";
 export const DELETE_ACCOUNT = "delete-account";
+export const VERIFY_ACCOUNT = "verify-account";
 export const SET_SHOW_INTRO = "set-show-intro";
 
 export const UPDATE_NOTES = "update-note";

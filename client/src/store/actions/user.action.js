@@ -143,3 +143,17 @@ export const deleteUserAccount = ({ password }) => {
     }
   };
 };
+
+export const verifyUserAccount = (token) => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.get("/api/user/verify", { params: { validation: token } });
+      if (response.data) {
+        dispatch(actions.verifyAccount());
+        dispatch(actions.successGlobal("Your account was verified", true));
+      }
+    } catch (err) {
+      dispatch(actions.errorGlobal(err.response.data.message, true));
+    }
+  };
+};

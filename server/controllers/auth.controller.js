@@ -8,7 +8,7 @@ const authController = {
       const user = await authService.createUser(userData);
       const token = await authService.genAuthToken(user);
 
-      // await emailService.registerEmail(email, user);
+      await emailService.registerEmail(userData.email, user);
 
       resp
         .cookie("x-access-token", token)

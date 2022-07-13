@@ -1,6 +1,9 @@
 const status = require("http-status");
+const { AccessControl } = require("accesscontrol");
 const { ApiError } = require("../middleware/apiError");
 const { authService, userService, emailService } = require("../services");
+
+const responseFilter = ["*", "!password", "!_id"];
 
 const userController = {
   async profile(req, resp, next) {
@@ -61,7 +64,8 @@ const userController = {
 
       user.verified = true;
       user.save();
-      resp.status(status.CREATED).send({ user });
+      resp.status(status.CREATED).send(AccessControl.filter(user._doc, responseFilter));
+      // resp.status(status.CREATED).send({ user });
     } catch (err) {
       next(err);
     }

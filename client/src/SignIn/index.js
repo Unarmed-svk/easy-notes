@@ -22,8 +22,8 @@ import { useNavigate } from "react-router-dom";
 import { clearNotification } from "../store/actions";
 
 const initialFormValues = {
-  email: "test@gmail.com",
-  password: "test12345",
+  email: "",
+  password: "",
   confirmPassword: "",
   firstname: "",
   lastname: "",
@@ -161,20 +161,21 @@ const SignIn = ({ theme }) => {
   useEffect(() => {
     if (notification.success) {
       setTimeout(() => {
-        navigate(`../?verifyEmail=true`);
-      }, 1000);
+        navigate(`/`);
+      }, 500);
+      setIsLoading(false);
       setFormMessage(notification);
       dispatch(clearNotification());
     } else if (notification.error) {
       console.error(`There was an error! ${notification.message}`);
       setFormMessage(notification);
+      setIsLoading(false);
       dispatch(clearNotification());
     }
   }, [notification, navigate, dispatch]);
 
   useEffect(() => {
     if (shouldSubmit) {
-      setIsLoading(false);
       setShouldSubmit(false);
       dispatch(isRegister ? userRegister(form) : userLogin(form));
     }

@@ -162,7 +162,6 @@ const Notes = ({ theme }) => {
 
   const styles = {
     mainContainer: css`
-      position: relative;
       padding-bottom: 5rem;
 
       & .MuiFab-root {
@@ -281,6 +280,7 @@ const Notes = ({ theme }) => {
   const [changedNotes, setChangedNotes] = useState([]);
   const [nextFilterDispatch, setNextFilterDispatch] = useState({});
   const [isExiting, setIsExiting] = useState(false);
+  const [isNoteAnimating, setIsNoteAnimating] = useState(false);
 
   const addNoteChange = (note, action) => {
     setChangedNotes((changedNotes) => [...changedNotes, { ...note, action }]);
@@ -389,7 +389,7 @@ const Notes = ({ theme }) => {
         <Collapse in={showFilters && !isSmall} sx={styles.filtersWrapper}>
           {!isSmall && (
             <FiltersBar
-              disabled={isExiting}
+              disabled={isExiting || isNoteAnimating}
               values={filterState}
               onChange={handleFilterChange}
               spacing={{ md: 5 }}
@@ -419,6 +419,8 @@ const Notes = ({ theme }) => {
                 in={note.action === undefined}
                 timeout={{ enter: 0, exit: 1000 }}
                 unmountOnExit
+                onExit={() => setIsNoteAnimating(true)}
+                onExited={() => setIsNoteAnimating(false)}
               >
                 {(itemState) => (
                   <div key={note._id} css={styles.item} className={`item-${itemState}`}>

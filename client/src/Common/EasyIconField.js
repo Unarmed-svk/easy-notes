@@ -35,13 +35,14 @@ const EasyIconField = ({ iconComponent, wrapperSX, sx, ...rest }) => {
   );
 };
 
-export const DebouncedIconField = ({ iconComponent, wrapperSX, sx, ...rest }) => {
+export const DebouncedIconField = ({ iconComponent, wrapperSX, sx, className, ...rest }) => {
   return (
     <Box
       sx={css`
         ${defaultStyles.box};
         ${wrapperSX};
       `}
+      className={`EasyIconField-root ${className || ""}`}
     >
       {iconComponent}
       <DebouncedTextField

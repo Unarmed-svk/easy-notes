@@ -8,6 +8,7 @@ import {
   UPDATE_NOTES,
   DELETE_ACCOUNT,
   SET_SHOW_INTRO,
+  VERIFY_ACCOUNT,
 } from "../types";
 
 /*-------- AUTH ---------*/
@@ -30,6 +31,10 @@ export const patchProfile = (profile) => ({
 
 export const deleteAccount = () => ({
   type: DELETE_ACCOUNT,
+});
+
+export const verifyAccount = () => ({
+  type: VERIFY_ACCOUNT,
 });
 
 // export const patchPassword = (passwords) => ({

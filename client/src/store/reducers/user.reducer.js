@@ -5,6 +5,7 @@ import {
   UPDATE_NOTES,
   DELETE_ACCOUNT,
   SET_SHOW_INTRO,
+  VERIFY_ACCOUNT,
 } from "../types";
 
 let DEFAULT_USER_STATE = {
@@ -50,6 +51,11 @@ export default function userReducer(state = DEFAULT_USER_STATE, action) {
         ...state,
         data: DEFAULT_USER_STATE.data,
         auth: false,
+      };
+    case VERIFY_ACCOUNT:
+      return {
+        ...state,
+        data: { ...state.data, verified: true },
       };
     case UPDATE_NOTES:
       return { ...state, data: { ...state.data, ...action.payload } };

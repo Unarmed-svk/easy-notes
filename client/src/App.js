@@ -17,7 +17,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import skLocale from "date-fns/locale/sk";
 import "./App.css";
-import AnimTest from "./AnimTest";
+import ScrollToTop from "./Common/ScrollToTop";
+import Verify from "./Verify";
 
 const theme = createTheme({
   palette: {
@@ -95,13 +96,13 @@ const App = () => {
           <Loading fullScreen />
         ) : (
           <Router>
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<Layout theme={theme} user={user} />}>
                 <Route index element={guard(<Notes theme={theme} />)} />
                 <Route path="create" element={guard(<Create theme={theme} />)} />
                 <Route path="profile" element={guard(<Profile theme={theme} />)} />
                 <Route path="signout" element={<SignOut theme={theme} />} />
-                <Route path="test" element={<AnimTest />} />
               </Route>
               <Route
                 path="/signin"
@@ -111,6 +112,7 @@ const App = () => {
                   </PreventSignin>
                 }
               />
+              <Route path="/verify" element={<Verify theme={theme} />} />
             </Routes>
           </Router>
         )}
@@ -183,5 +185,3 @@ const EasyAlert = React.forwardRef(function EasyAlert(props, ref) {
 });
 
 export default App;
-
-// TODO: Change all english texts into slovak.
