@@ -78,7 +78,7 @@ const Verify = ({ theme }) => {
     fontSize: { xs: theme.typography.h5.fontSize, sm: theme.typography.h4.fontSize },
   };
 
-  const { notification, user } = useSelector((state) => state);
+  const notification = useSelector((state) => state.notification);
   const dispatch = useDispatch();
 
   const [searchParams] = useSearchParams();
@@ -93,15 +93,6 @@ const Verify = ({ theme }) => {
     setIsLoading(true);
     dispatch(verifyUserAccount(token));
   };
-
-  const handleEnterClick = () => {
-    if (user.auth) {
-    }
-  };
-  /* TODO: Finish the email verification page.
-   *        -  Finish the sumbit
-   *         -  Add transition when the verification is completed
-   */
 
   useEffect(() => {
     setToken(searchParams.get("validation"));

@@ -121,7 +121,7 @@ const Profile = ({ theme }) => {
         console.error(`Incorrect formID: ${formID} in Profile submit handler`);
     }
 
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
   const handleFormChange = (formID, formData) => setActiveFormState(formData);
@@ -137,7 +137,9 @@ const Profile = ({ theme }) => {
 
   useEffect(() => {
     if (notification.success) {
+      setIsLoading(false);
     } else if (notification.error) {
+      setIsLoading(false);
       console.error(notification.message);
     }
     return () => {
